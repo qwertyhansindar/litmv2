@@ -1,19 +1,11 @@
 <section class="litm-hero-board">
-	<!-- Cards: turns a theme card over to its note. -->
-	{{#*inline "flipButton"}}
-	<button type="button" data-action="flipThemeCard" aria-pressed="false"
-		data-tooltip="{{localize 'LITM.Ui.flip_card'}}" aria-label="{{localize 'LITM.Ui.flip_card'}}">
-		<i class="fa-solid fa-rotate" aria-hidden="true"></i>
-	</button>
-	{{/inline}}
-
 	<!-- Fellowship + Relationships: a theme card. Cards renders it in the themes row. -->
 	{{#*inline "fellowshipCard"}}
 	{{#if (and hasFellowship (or relationshipVisible.length fellowship.hasTheme fellowshipActorId))}}
 	<fieldset class="theme-card item"{{#if @root.cardsLayout}} data-fellowship-card data-flip-key="{{fellowship._id}}"{{else}}
 		data-action="toggleThemeDescription"
 		data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}"{{/if}} data-tour="fellowship-section" data-banner="fellowship">
-		<legend class="litm-banner theme-card__book{{#if @root.cardsLayout}} draggable{{/if}}">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}{{#if (and @root.cardsLayout fellowship.hasTheme fellowship.system.description)}}{{> flipButton}}{{/if}}</legend>
+		<legend class="litm-banner theme-card__book{{#if @root.cardsLayout}} draggable{{/if}}">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}{{#if (and @root.cardsLayout fellowship.hasTheme fellowship.system.description)}}{{> "systems/litmv2/templates/partials/flip-button.html"}}{{/if}}</legend>
 		{{#if (and @root.cardsLayout fellowship.hasTheme fellowship.system.description)}}<div class="theme-card__back">{{{ fellowship.system.description }}}</div>{{/if}}
 		{{#if fellowship.hasTheme}}
 		<div data-fellowship-actor-id="{{fellowship.actorId}}" data-item-id="{{fellowship._id}}">
@@ -65,7 +57,7 @@
 		<fieldset class="theme-card item"{{#if @root.cardsLayout}} data-item-id="{{theme._id}}" data-flip-key="{{theme._id}}"{{else}}
 			data-action="toggleThemeDescription"
 			data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}"{{/if}} data-id="{{theme._id}}" data-level="{{theme.system.level}}">
-			<legend class="litm-banner theme-card__book{{#if @root.cardsLayout}} draggable{{/if}}">{{#if @root.cardsLayout}}<img class="litm--banner-icon" src="{{theme.img}}" alt="{{theme.levelLabel}}" data-tooltip="{{theme.levelLabel}}" />{{/if}}{{theme.system.themebook}}{{#if (and @root.cardsLayout theme.system.description)}}{{> flipButton}}{{/if}}</legend>
+			<legend class="litm-banner theme-card__book{{#if @root.cardsLayout}} draggable{{/if}}">{{#if @root.cardsLayout}}<img class="litm--banner-icon" src="{{theme.img}}" alt="{{theme.levelLabel}}" data-tooltip="{{theme.levelLabel}}" />{{/if}}{{theme.system.themebook}}{{#if (and @root.cardsLayout theme.system.description)}}{{> "systems/litmv2/templates/partials/flip-button.html"}}{{/if}}</legend>
 			{{#if (and @root.cardsLayout theme.system.description)}}<div class="theme-card__back">{{{ theme.system.description }}}</div>{{/if}}
 			{{> systems/litmv2/templates/partials/theme-card-header.html theme}}
 

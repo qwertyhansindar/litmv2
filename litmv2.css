@@ -8687,6 +8687,10 @@ body.theme-dark
 	padding-inline-end: calc(2 * var(--spacer-8) + 3.2em + var(--spacer-4));
 }
 
+.litm-hero-cards .theme-card > legend:has(button + button + button) {
+	padding-inline-end: calc(2 * var(--spacer-8) + 4.8em + 2 * var(--spacer-4));
+}
+
 /* Story cards and Edit mode wrap the title in its own banner span: strip
    that chrome, and let it shrink and wrap (mid-word only as a last resort)
    so it never runs under the strip buttons. */
@@ -8749,11 +8753,16 @@ body.theme-dark
 	}
 }
 
-/* Edit mode puts edit + remove in the banner: step the earlier one left so
-   they sit side by side instead of stacked. ponytail: handles two buttons;
-   a third would need a flex group at the strip's end. */
+/* Edit mode puts flip + edit + remove in the banner: step the earlier ones
+   left so they sit side by side instead of stacked.
+   shortcut: handles three buttons; a fourth would need a flex group at the
+   strip's end. */
 .litm-hero-cards .theme-card > legend button:has(+ button) {
 	inset-inline-end: calc(var(--spacer-8) + 1.6em + var(--spacer-4));
+}
+
+.litm-hero-cards .theme-card > legend button:has(+ button + button) {
+	inset-inline-end: calc(var(--spacer-8) + 3.2em + 2 * var(--spacer-4));
 }
 
 /* Title: centred under the banner. The chip stays interactive; long names
@@ -8969,13 +8978,13 @@ body.theme-dark
 }
 
 /* Lower panel, as in the book: tracks, Quest and special improvements,
-   over the card's colour wash. Pinned to the card's foot, so tracks line up
-   across a row of equal-height cards. */
+   over the card's colour wash. It follows the tags rather than pinning to
+   the foot: pinned, a short card in a row of tall ones opened a blank gap
+   under its tags. */
 .litm-hero-cards .theme-card__lower {
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacer-8);
-	margin-top: auto;
 }
 
 /* Tracks: three equal columns — pips centred, small-caps label beneath. */
