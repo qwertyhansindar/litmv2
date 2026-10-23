@@ -2,7 +2,9 @@ import { ChallengeSheet } from "../actor/challenge/challenge-sheet.js";
 import { FellowshipSheet } from "../actor/fellowship/fellowship-sheet.js";
 import { HeroSheet } from "../actor/hero/hero-sheet.js";
 import { JourneySheet } from "../actor/journey/journey-sheet.js";
+import { FLAGS } from "../system/config.js";
 import { LitmActorSheet } from "./base-actor-sheet.js";
+import { fellowshipSlot, fellowshipSlotAfterDrop } from "./card-order.js";
 import { isDescriptionShort } from "./description-fit.js";
 
 const LANDSCAPE_OPTIONS = {
@@ -124,7 +126,62 @@ export class HeroSheetCards extends HeroSheet {
 	async _prepareContext(options) {
 		const context = await super._prepareContext(options);
 		context.cardsLayout = true;
+		context.fellowshipSlot = fellowshipSlot(
+			this.document.getFlag("litmv2", FLAGS.fellowshipIndex),
+			context.themes?.length ?? 0,
+		);
 		return context;
+	}
+
+	/* -------------------------------------------- */
+	/*  Card reordering                             */
+	/* -------------------------------------------- */
+
+	/** Drag type for the Fellowship card, which is not an item of this hero. */
+	static FELLOWSHIP_CARD_DRAG = "litmv2.FellowshipCard";
+
+	/** @override */
+	_onDragStart(event) {
+		if (!event.currentTarget.matches("[data-fellowship-card]"))
+			return super._onDragStart(event);
+		event.dataTransfer.setData(
+			"text/plain",
+			JSON.stringify({
+				type: HeroSheetCards.FELLOWSHIP_CARD_DRAG,
+				actorUuid: this.document.uuid,
+			}),
+		);
+	}
+
+	/** @override */
+	async _onDrop(event) {
+		const data =
+			foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+		if (data.type !== HeroSheetCards.FELLOWSHIP_CARD_DRAG)
+			return super._onDrop(event);
+		if (data.actorUuid !== this.document.uuid || !this.isEditable) return;
+		const card = event.target.closest(".litm-hero-board__themes > .theme-card");
+		if (!card || card.matches("[data-fellowship-card]")) return;
+		const themeCards = [
+			...card.parentElement.querySelectorAll(
+				":scope > .theme-card:not([data-fellowship-card])",
+			),
+		];
+		const slot = fellowshipSlot(
+			this.document.getFlag("litmv2", FLAGS.fellowshipIndex),
+			themeCards.length,
+		);
+		return this.document.setFlag(
+			"litmv2",
+			FLAGS.fellowshipIndex,
+			fellowshipSlotAfterDrop(slot, themeCards.indexOf(card)),
+		);
+	}
+
+	/** A theme dropped on the Fellowship card has no item to sort against. */
+	_onSortItem(event, item) {
+		if (event.target.closest("[data-fellowship-card]")) return;
+		return super._onSortItem(event, item);
 	}
 
 	/** @override */

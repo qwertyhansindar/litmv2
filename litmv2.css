@@ -1113,9 +1113,21 @@ section.standard-form.litm-actions-app {
 	--tag-color: var(--color-litm-limit);
 }
 
-/* Banner — decorative plaque with notched corners */
+/* Banner — decorative plaque with notched corners. The mask is a token so
+   the Cards sheet's banner strips (§25) cut the same notches. */
+:root {
+	--litm-banner-mask:
+		radial-gradient(circle at 0 0, transparent 6px, black 6.5px) top left /
+		51% 51% no-repeat,
+		radial-gradient(circle at 100% 0, transparent 6px, black 6.5px) top right /
+		51% 51% no-repeat,
+		radial-gradient(circle at 0 100%, transparent 6px, black 6.5px) bottom left /
+		51% 51% no-repeat,
+		radial-gradient(circle at 100% 100%, transparent 6px, black 6.5px) bottom
+		right / 51% 51% no-repeat;
+}
+
 .litm-banner {
-	--banner-notch: 6px;
 	--banner-bg: var(--color-litm-banner);
 	display: inline-block;
 	background: var(--banner-bg);
@@ -1127,33 +1139,7 @@ section.standard-form.litm-actions-app {
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
 	color: var(--color-text-primary);
-	mask:
-		radial-gradient(
-			circle at 0 0,
-			transparent var(--banner-notch),
-			black calc(var(--banner-notch) + 0.5px)
-		)
-		top left,
-		radial-gradient(
-			circle at 100% 0,
-			transparent var(--banner-notch),
-			black calc(var(--banner-notch) + 0.5px)
-		)
-		top right,
-		radial-gradient(
-			circle at 0 100%,
-			transparent var(--banner-notch),
-			black calc(var(--banner-notch) + 0.5px)
-		)
-		bottom left,
-		radial-gradient(
-			circle at 100% 100%,
-			transparent var(--banner-notch),
-			black calc(var(--banner-notch) + 0.5px)
-		)
-		bottom right;
-	mask-size: 51% 51%;
-	mask-repeat: no-repeat;
+	mask: var(--litm-banner-mask);
 }
 
 .litm-banner--sm {
@@ -8213,6 +8199,9 @@ body.litm--colorblind .themed.theme-dark,
 		transparent
 	);
 	--litm-banner-ink: #f6efe4;
+	--litm-banner-rim:
+		inset 0 2px 0 var(--color-overlay-black-40),
+		inset 0 -2px 0 var(--color-overlay-black-40);
 	--litm-banner-fellowship: var(--color-litm-track-milestone);
 	--litm-banner-kit: var(--color-litm-limit-accent);
 	--litm-kit-strip: var(--litm-banner-kit);
@@ -8379,10 +8368,11 @@ body.litm--colorblind .themed.theme-dark,
 	}
 }
 
-/* Actions bar: one row of ink-on-parchment buttons of equal height. The
-   prompt leads, a rule runs to the buttons; icon-only until there is room. */
+/* Actions bar: always one row of ink-on-parchment buttons of equal height.
+   The prompt leads, a rule runs to the buttons and gives way first; icon-only
+   until there is room. */
 .litm-hero-cards .litm--play-actions {
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	justify-content: flex-start;
 	gap: var(--spacer-8) var(--spacer-12);
 	padding-top: var(--spacer-8);
@@ -8394,11 +8384,17 @@ body.litm--colorblind .themed.theme-dark,
 	&::after {
 		order: 1;
 		flex: 1 1 var(--spacer-16);
+		min-width: 0;
 	}
+}
+
+.litm-hero-cards .litm--play-actions__prompt {
+	white-space: nowrap;
 }
 
 .litm-hero-cards .litm--play-actions__buttons {
 	order: 2;
+	flex-wrap: nowrap;
 	justify-content: flex-end;
 }
 
@@ -8628,10 +8624,11 @@ body.theme-dark
 	--litm-banner-bg: var(--litm-level);
 }
 
-/* Banner: the <legend> restyled as a full-width strip. Floating it takes it
-   out of the fieldset's border (it is no longer the "rendered legend"), so it
-   lays out as an ordinary block; negative margins bleed it to the card edge.
-   It stays a <legend>, so the themebook name is still read as the card's label. */
+/* Banner: the <legend> restyled as the classic notched plaque, inset across
+   the card's width. Floating it takes it out of the fieldset's border (it is
+   no longer the "rendered legend"), so it lays out as an ordinary block. It
+   stays a <legend>, so the themebook name is still read as the card's label.
+   The mask clips outer shadows, so the dark rim is an inset one. */
 .litm-hero-cards .theme-card > legend {
 	position: relative;
 	float: inline-start;
@@ -8641,15 +8638,13 @@ body.theme-dark
 	justify-content: center;
 	gap: var(--spacer-8);
 	/* Explicit width: a floated box would otherwise shrink to its content. */
-	width: calc(100% + 2 * var(--litm-card-pad));
-	/* Foundry caps legends at 100%, which would undo the bleed. */
-	max-width: none;
-	margin: 0 calc(-1 * var(--litm-card-pad));
+	width: 100%;
+	margin: var(--spacer-8) 0 0;
 	padding: var(--spacer-4) var(--spacer-12);
 	background: var(--litm-banner-bg);
-	border-radius: calc(var(--litm-card-radius) - 1px)
-		calc(var(--litm-card-radius) - 1px) 0 0;
-	mask: none;
+	border-radius: 0;
+	mask: var(--litm-banner-mask);
+	box-shadow: var(--litm-banner-rim);
 	font-size: var(--font-size-14);
 	font-variant-caps: small-caps;
 	letter-spacing: 0.2em;
@@ -8659,20 +8654,30 @@ body.theme-dark
 }
 
 /* Reserve room for the absolutely placed buttons so a long title never runs
-   under them (one button, or edit + remove). */
+   under them (one button, or edit + remove). Only the button end is
+   reserved, and the tracking tightens: a centred title with both ends
+   reserved left too little room for one long themebook word. */
 .litm-hero-cards .theme-card > legend:has(button) {
-	padding-inline: calc(2 * var(--spacer-8) + 1.6em);
+	padding-inline-end: calc(2 * var(--spacer-8) + 1.6em);
+	letter-spacing: 0.1em;
 }
 
 .litm-hero-cards .theme-card > legend:has(button + button) {
-	padding-inline: calc(2 * var(--spacer-8) + 3.2em + var(--spacer-4));
+	padding-inline-end: calc(2 * var(--spacer-8) + 3.2em + var(--spacer-4));
 }
 
-/* The story card's legend wraps its own banner span: strip that chrome. */
+/* Story cards and Edit mode wrap the title in its own banner span: strip
+   that chrome, and let it shrink and wrap (mid-word only as a last resort)
+   so it never runs under the strip buttons. */
 .litm-hero-cards .theme-card > legend .litm-banner {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: var(--spacer-8);
+	min-width: 0;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	text-align: center;
 	padding: 0;
 	background: none;
 	mask: none;
@@ -8746,7 +8751,7 @@ body.theme-dark
 	overflow: visible;
 }
 
-/* Header-scoped so it outranks the idle-chip rule below (the title is also a power tag). */
+/* Layout only: the title keeps the full chip colour, as in the roll dialog. */
 .litm-hero-cards .theme-card
 	:is(.theme-card-header, .story-theme-card__header)
 	.litm-title_tag {
@@ -8755,20 +8760,6 @@ body.theme-dark
 	text-align: center;
 	font-size: var(--font-size-24);
 	letter-spacing: 0.04em;
-
-	/* Quiet: ink text on a faint tint, so a two-line title is not a heavy block. */
-	&::before {
-		content: none;
-	}
-
-	&::after {
-		background: color-mix(in srgb, var(--tag-color) 12%, transparent);
-		transition: background var(--transition-normal);
-	}
-
-	&:hover::after {
-		background: color-mix(in srgb, var(--tag-color) 30%, transparent);
-	}
 }
 
 .litm-hero-cards .story-theme-card__header > .flexcol {
@@ -8798,43 +8789,6 @@ body.theme-dark
 	display: flex;
 	flex-direction: column;
 	margin-top: var(--spacer-8);
-}
-
-/* Idle chips are light — a faint highlighter, no stroked outline — so a card
-   of six tags reads as printed lines, not a wall of colour. Power versus
-   weakness stays legible from the tint, the ink and the chevron glyph. */
-.litm-hero-cards .theme-card
-	:is(.litm-power_tag, .litm-fellowship_tag, .litm-weakness_tag) {
-	&::before {
-		content: none;
-	}
-
-	&::after {
-		background: color-mix(in srgb, var(--tag-color) 55%, transparent);
-		transition: background var(--transition-normal);
-	}
-
-	&:hover::after {
-		background: color-mix(in srgb, var(--tag-color) 75%, transparent);
-	}
-
-	/* Scratched: muted, struck through, the scratch glyph kept. */
-	&.scratched {
-		opacity: 0.6;
-	}
-
-	&.scratched::after {
-		background: none;
-	}
-}
-
-.litm-hero-cards .theme-card .litm-weakness_tag {
-	color: var(--color-litm-weakness-text);
-}
-
-/* Weakness ink needs a lighter hover tint to keep its contrast. */
-.litm-hero-cards .theme-card .litm-weakness_tag:hover::after {
-	background: color-mix(in srgb, var(--tag-color) 65%, transparent);
 }
 
 /* Quest band: a small-caps label strip, then the quote, centred. */
@@ -8910,25 +8864,52 @@ body.theme-dark
 	font-style: italic;
 }
 
-/* The fellowship card wraps its theme in a div: make it a column too, so the
-   tracks pin to the bottom of the theme, not the relationship list. */
-.litm-hero-cards .theme-card > [data-fellowship-actor-id] {
+/* The fellowship card wraps its theme in a div (and, in Edit mode, a second
+   .item div): make them columns too, so the lower panel fills the theme, not
+   the relationship list. */
+.litm-hero-cards .theme-card > [data-fellowship-actor-id],
+.litm-hero-cards .theme-card > [data-fellowship-actor-id] > .item {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 	gap: var(--spacer-8);
 }
 
-/* Tracks: a footer of three equal columns — pips centred, small-caps label
-   beneath. Pinned to the card bottom so footers line up across a row of
-   equal-height cards. */
+/* Lower panel, as in the book: tracks, Quest, note and special
+   improvements on a band of the theme's colour. It grows to the card's
+   bottom edge, so the note (inside it) still takes up any free height in a
+   row of equal-height cards. It bleeds to the card edge only when it is the
+   last thing in the card; a Fellowship's relationships follow below it. */
+.litm-hero-cards .theme-card__lower {
+	display: flex;
+	flex: 1 0 auto;
+	flex-direction: column;
+	gap: var(--spacer-8);
+	margin-inline: calc(-1 * var(--litm-card-pad));
+	padding: var(--spacer-8) var(--litm-card-pad) var(--litm-card-pad);
+	background: color-mix(in srgb, var(--litm-level) 22%, transparent);
+}
+
+.litm-hero-cards .theme-card > .theme-card__lower:last-child,
+.litm-hero-cards
+	.theme-card
+	> [data-fellowship-actor-id]:last-child
+	> .theme-card__lower:last-child,
+.litm-hero-cards
+	.theme-card
+	> [data-fellowship-actor-id]:last-child
+	> .item:last-child
+	> .theme-card__lower:last-child {
+	margin-bottom: calc(-1 * var(--litm-card-pad));
+	border-radius: 0 0 calc(var(--litm-card-radius) - 1px)
+		calc(var(--litm-card-radius) - 1px);
+}
+
+/* Tracks: three equal columns — pips centred, small-caps label beneath. */
 .litm-hero-cards .theme-card-tracks {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(min-content, 1fr));
 	gap: var(--spacer-8);
-	margin-top: auto;
-	padding-top: var(--spacer-8);
-	border-top: 1px solid var(--litm-card-rule);
 }
 
 .litm-hero-cards .theme-card-track {
@@ -8973,91 +8954,55 @@ body.theme-dark
 /* ----------------------------------------
    25c. Cards — Kit sections (backpack, statuses, fellowship, story themes, relationships)
    ---------------------------------------- */
-/* The kit row (Backpack, Statuses, Fellowship, Relationships) is a second
-   row of cards under the themes. The two wrappers dissolve so every card is
-   its own grid cell: 1-up when narrow, 2-up, then 4-up lined up under the
-   4-up theme row. Themes, story themes and Moment of Fulfillment span the
-   full width. Grid items stretch, so cards in a row share a height. */
+/* The board is a column of rows, and each row is its own intrinsic grid:
+   no container query, because the board is the content part, and a part
+   cannot match a query on itself. Themes and the Fellowship share one row of
+   equal cards; Statuses and Backpack share a row once both fit. Grid items
+   stretch, so cards in a row share a height. */
 .litm-hero-cards .litm-hero-board {
-	grid-template-areas: none;
+	display: flex;
+	flex-direction: column;
 }
 
-.litm-hero-cards .litm-hero-board > * {
-	grid-area: auto;
+.litm-hero-cards :is(.litm-hero-board__themes, .litm-hero-board__story-grid) {
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
 }
 
-.litm-hero-cards .litm-hero-board__inventory,
-.litm-hero-cards .litm-hero-board__fellowship {
-	display: contents;
+.litm-hero-cards .litm-hero-board__inventory {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
 }
 
-.litm-hero-cards
-	.litm-hero-board
-	> :is(
-		.litm-hero-board__themes,
-		.litm-hero-board__story,
-		.litm-hero-board__mof
+/* At 15rem a long tag wraps rather than widening the card. */
+.litm-hero-cards .theme-card
+	:is(
+		.litm-power_tag,
+		.litm-weakness_tag,
+		.litm-fellowship_tag,
+		.litm-relationship_tag,
+		.litm-story_tag
 	) {
-	grid-column: 1 / -1;
-}
-
-/* A card never compresses below its longest tag or status: chips stay on
-   one line, and every column's minimum is its content's min-content width.
-   Past that point the board scrolls sideways instead of squeezing. Columns
-   follow the width of the board itself (the content part), which is the
-   sheet minus the hero panel. */
-.litm-hero-cards
-:is(.litm-hero-board, .litm-hero-board__themes, .litm-hero-board__story-grid) {
-	grid-template-columns: minmax(min-content, 1fr);
+	white-space: normal;
 }
 
 .litm-hero-cards [data-application-part="content"] {
-	container: litm-board / inline-size;
-	/* Auto, not clip: a clip box would eat focus rings; the padding/margin
-	   pair keeps card shadows and rings inside it. */
-	overflow-x: auto;
+	/* The pane scrolls; the padding/margin pair keeps card shadows and focus
+	   rings inside its clip box. */
 	padding: 4px;
 	margin: -4px;
 	scrollbar-width: thin;
-}
-
-@container litm-board (min-width: 520px) {
-	.litm-hero-cards
-		:is(
-			.litm-hero-board,
-			.litm-hero-board__themes,
-			.litm-hero-board__story-grid
-		) {
-		grid-template-columns: repeat(2, minmax(min-content, 1fr));
-	}
-}
-
-@container litm-board (min-width: 1000px) {
-	.litm-hero-cards
-		:is(
-			.litm-hero-board,
-			.litm-hero-board__themes,
-			.litm-hero-board__story-grid
-		) {
-		grid-template-columns: repeat(4, minmax(min-content, 1fr));
-	}
-
-	/* Two cards share the lead row, half the board each. */
-	.litm-hero-cards .litm-hero-board__inventory > * {
-		grid-column: span 2;
-	}
 }
 
 /* Statuses and story tags change every scene, so they lead the board — above
    the themes, without scrolling. Statuses first: they count toward Power. */
 /* Structural, so Play and Edit mode both get it: the inventory wrapper holds
    the backpack (or its empty state) then the statuses, in either template. */
-.litm-hero-cards .litm-hero-board__inventory > * {
+.litm-hero-cards .litm-hero-board__inventory {
 	order: -1;
 }
 
 .litm-hero-cards .litm-hero-board__inventory > :last-child {
-	order: -2;
+	order: -1;
 }
 
 /* Strip colour: sienna as-is on parchment. The dark theme lifts the sienna
@@ -9088,7 +9033,7 @@ body.theme-dark.litm--colorblind .litm-hero-cards:not(.theme-light),
 }
 
 /* Floated, the legend stops being the fieldset's border-straddling legend
-   and becomes an ordinary box; negative margins bleed it to the card edge. */
+   and becomes an ordinary box: the same inset notched plaque as a theme. */
 .litm-hero-cards fieldset.litm-kit-card > legend.litm-kit-card__head {
 	float: inline-start;
 	position: relative;
@@ -9097,13 +9042,13 @@ body.theme-dark.litm--colorblind .litm-hero-cards:not(.theme-light),
 	justify-content: center;
 	gap: var(--spacer-8);
 	box-sizing: border-box;
-	width: calc(100% + 2 * var(--spacer-12));
-	margin: 0 calc(-1 * var(--spacer-12));
+	width: 100%;
+	margin: var(--spacer-8) 0 0;
 	padding: var(--spacer-4) var(--spacer-12);
-	border-radius: calc(var(--litm-card-radius) - 1px)
-		calc(var(--litm-card-radius) - 1px) 0 0;
+	border-radius: 0;
 	background: var(--litm-kit-strip);
-	mask: none;
+	mask: var(--litm-banner-mask);
+	box-shadow: var(--litm-banner-rim);
 	font-family: var(--font-serif);
 	font-size: var(--font-size-14);
 	font-weight: 600;
@@ -9118,6 +9063,17 @@ body.theme-dark.litm--colorblind .litm-hero-cards:not(.theme-light),
 	fieldset.litm-kit-card
 	> legend.litm-kit-card__head:has(button) {
 	padding-inline: calc(2 * var(--spacer-8) + 1.5rem);
+}
+
+.litm-hero-cards
+	fieldset.litm-kit-card
+	> legend.litm-kit-card__head:has(button + button) {
+	padding-inline: calc(2 * var(--spacer-8) + 3rem + var(--spacer-4));
+}
+
+/* Two strip buttons sit side by side, as on the theme strip. */
+.litm-hero-cards .litm-kit-card__head button:has(+ button) {
+	inset-inline-end: calc(var(--spacer-8) + 1.5rem + var(--spacer-4));
 }
 
 /* The title keeps its .litm-banner markup for the classic sheet; here it is
@@ -9175,49 +9131,11 @@ body.theme-dark.litm--colorblind .litm-hero-cards:not(.theme-light),
 	font-size: var(--font-size-12);
 }
 
-/* Chips: wrap with one consistent gap, and go light (tint + ink underline)
-   like the idle chips on a theme card. */
+/* Chips wrap with one consistent gap; colour is the base chip's, as in the
+   roll dialog. */
 .litm-hero-cards .litm-kit-card
 	:is(.litm-kit-card__tags, .litm--play-statuses) {
 	gap: var(--spacer-8) var(--spacer-12);
-}
-
-.litm-hero-cards
-	.litm-kit-card
-	:is(.litm-backpack, .litm-relationship_tag, .litm-status) {
-	--tag-ink: var(--color-litm-tag-text);
-
-	&::before {
-		content: none;
-	}
-
-	&::after {
-		background: color-mix(in srgb, var(--tag-color) 55%, transparent);
-		border-bottom: 2px solid var(--tag-ink);
-	}
-
-	&.scratched {
-		opacity: 0.6;
-	}
-
-	&.scratched::after {
-		background: none;
-	}
-}
-
-.litm-hero-cards .litm-kit-card .litm-status {
-	--tag-ink: var(--color-litm-status-text);
-}
-
-/* The status token is a muted sage that all but vanishes as a tint; lean it
-   toward the Origin green so a status reads as green at a glance. Skipped in
-   colour-blind mode, where statuses are deliberately blue. */
-body:not(.litm--colorblind) .litm-hero-cards .litm-kit-card .litm-status {
-	--tag-color: color-mix(
-		in srgb,
-		var(--color-litm-status) 55%,
-		var(--color-litm-might-origin)
-	);
 }
 
 /* Relationships: portrait and name lead, the tag wraps beneath when narrow. */

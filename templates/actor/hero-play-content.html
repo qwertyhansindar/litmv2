@@ -1,29 +1,83 @@
 <section class="litm-hero-board">
+	<!-- Fellowship + Relationships: a theme card. Cards renders it in the themes row. -->
+	{{#*inline "fellowshipCard"}}
+	{{#if (and hasFellowship (or relationshipVisible.length fellowship.hasTheme fellowshipActorId))}}
+	<fieldset class="theme-card item{{#if @root.cardsLayout}} draggable{{/if}}"{{#if @root.cardsLayout}} data-fellowship-card{{/if}} data-tour="fellowship-section" data-banner="fellowship"
+		data-action="toggleThemeDescription"
+		data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}">
+		<legend class="litm-banner theme-card__book">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}</legend>
+		{{#if fellowship.hasTheme}}
+		<div data-fellowship-actor-id="{{fellowship.actorId}}" data-item-id="{{fellowship._id}}">
+			{{> systems/litmv2/templates/partials/theme-card-header.html fellowship noBurn=true}}
+
+			{{> systems/litmv2/templates/partials/play-theme-tags.html fellowship
+			noBurn=true
+			}}
+
+			{{#if @root.cardsLayout}}
+			{{#if relationshipVisible.length}}
+			<span class="theme-card__quest-label">{{localize "LITM.Terms.relationships"}}</span>
+			{{> systems/litmv2/templates/partials/hero-relationships.html}}
+			{{/if}}
+			<div class="theme-card__lower">
+				{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}
+				{{#if fellowship.system.quest.description}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{fellowship.system.quest.description}}</q></blockquote>{{/if}}
+				{{> systems/litmv2/templates/partials/theme-description.html description=fellowship.system.description id=fellowship._id}}
+				{{> systems/litmv2/templates/partials/theme-special-improvements.html fellowship}}
+			</div>
+			{{else}}
+			{{> systems/litmv2/templates/partials/theme-special-improvements.html fellowship}}
+			{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}
+			<blockquote class="theme-card__quest">{{fellowship.system.quest.description}}</blockquote>
+			{{> systems/litmv2/templates/partials/theme-description.html description=fellowship.system.description id=fellowship._id}}
+			{{/if}}
+		</div>
+		{{else}}
+		<p class="hint litm-kit-empty">
+			<button type="button" data-action="viewActor" data-actor-id="{{fellowshipActorId}}"
+				data-tooltip="{{localize 'LITM.Ui.click_to_edit_fellowship'}}">
+				{{> systems/litmv2/templates/partials/icon-fellowship-hint.html}}
+				{{localize "LITM.Ui.fellowship_no_theme"}}
+			</button>
+		</p>
+		{{/if}}
+		{{#if (and relationshipVisible.length (not (and @root.cardsLayout fellowship.hasTheme)))}}
+		{{#if @root.cardsLayout}}<span class="theme-card__quest-label">{{localize "LITM.Terms.relationships"}}</span>{{else}}<hr />{{/if}}
+		{{> systems/litmv2/templates/partials/hero-relationships.html}}
+		{{/if}}
+	</fieldset>
+	{{/if}}
+	{{/inline}}
+
 	<!-- Themes -->
 	{{#if themes.length}}
 	<div class="litm-hero-board__themes">
 		{{#each themes as |theme|}}
-		<fieldset class="theme-card item" data-id="{{theme._id}}" data-level="{{theme.system.level}}"
+		{{#if (eq @index @root.fellowshipSlot)}}{{> fellowshipCard @root}}{{/if}}
+		<fieldset class="theme-card item{{#if @root.cardsLayout}} draggable{{/if}}"{{#if @root.cardsLayout}} data-item-id="{{theme._id}}"{{/if}} data-id="{{theme._id}}" data-level="{{theme.system.level}}"
 			data-action="toggleThemeDescription"
 			data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}">
 			<legend class="litm-banner theme-card__book">{{#if @root.cardsLayout}}<img class="litm--banner-icon" src="{{theme.img}}" alt="{{theme.levelLabel}}" data-tooltip="{{theme.levelLabel}}" />{{/if}}{{theme.system.themebook}}</legend>
 			{{> systems/litmv2/templates/partials/theme-card-header.html theme}}
 
 			{{> systems/litmv2/templates/partials/play-theme-tags.html theme}}
-			{{> systems/litmv2/templates/partials/theme-special-improvements.html theme}}
-			{{#unless @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}{{/unless}}
 
 			{{#if @root.cardsLayout}}
-			{{#if theme.system.quest.description}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{theme.system.quest.description}}</q></blockquote>{{/if}}
+			<div class="theme-card__lower">
+				{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}
+				{{#if theme.system.quest.description}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{theme.system.quest.description}}</q></blockquote>{{/if}}
+				{{> systems/litmv2/templates/partials/theme-description.html description=theme.system.description id=theme._id}}
+				{{> systems/litmv2/templates/partials/theme-special-improvements.html theme}}
+			</div>
 			{{else}}
+			{{> systems/litmv2/templates/partials/theme-special-improvements.html theme}}
+			{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}
 			<blockquote class="theme-card__quest">{{theme.system.quest.description}}</blockquote>
-			{{/if}}
-
 			{{> systems/litmv2/templates/partials/theme-description.html description=theme.system.description id=theme._id}}
-
-			{{#if @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}{{/if}}
+			{{/if}}
 		</fieldset>
 		{{/each}}
+		{{#if (eq @root.fellowshipSlot themes.length)}}{{> fellowshipCard}}{{/if}}
 	</div>
 	{{else}}
 	<div class="litm-hero-board__themes empty-state">
@@ -106,57 +160,11 @@
 		</fieldset>
 	</div>
 
-	<!-- Fellowship + Relationships -->
-	{{#if (and hasFellowship (or relationshipVisible.length fellowship.hasTheme fellowshipActorId))}}
+	{{#if (and hasFellowship (or relationshipVisible.length fellowship.hasTheme fellowshipActorId))}}{{#unless (and @root.cardsLayout themes.length)}}
 	<div class="litm-hero-board__fellowship">
-		<fieldset class="theme-card item" data-tour="fellowship-section" data-banner="fellowship"
-			data-action="toggleThemeDescription"
-			data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}">
-			<legend class="litm-banner theme-card__book">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}</legend>
-			{{#if fellowship.hasTheme}}
-			<div data-fellowship-actor-id="{{fellowship.actorId}}" data-item-id="{{fellowship._id}}">
-				{{> systems/litmv2/templates/partials/theme-card-header.html fellowship noBurn=true}}
-
-				{{> systems/litmv2/templates/partials/play-theme-tags.html fellowship
-				noBurn=true
-				}}
-				{{> systems/litmv2/templates/partials/theme-special-improvements.html fellowship}}
-				{{#unless @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}{{/unless}}
-
-				{{#if @root.cardsLayout}}
-				{{#if fellowship.system.quest.description}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{fellowship.system.quest.description}}</q></blockquote>{{/if}}
-				{{else}}
-				<blockquote class="theme-card__quest">{{fellowship.system.quest.description}}</blockquote>
-				{{/if}}
-
-				{{> systems/litmv2/templates/partials/theme-description.html description=fellowship.system.description id=fellowship._id}}
-
-				{{#if @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}{{/if}}
-			</div>
-			{{else}}
-			<p class="hint litm-kit-empty">
-				<button type="button" data-action="viewActor" data-actor-id="{{fellowshipActorId}}"
-					data-tooltip="{{localize 'LITM.Ui.click_to_edit_fellowship'}}">
-					{{> systems/litmv2/templates/partials/icon-fellowship-hint.html}}
-					{{localize "LITM.Ui.fellowship_no_theme"}}
-				</button>
-			</p>
-			{{/if}}
-			{{#if (and relationshipVisible.length (not @root.cardsLayout))}}
-			<hr />
-			{{> systems/litmv2/templates/partials/hero-relationships.html}}
-			{{/if}}
-		</fieldset>
-		{{#if (and relationshipVisible.length @root.cardsLayout)}}
-		<fieldset class="litm-kit-card litm-kit-card--relationships">
-			<legend class="litm-kit-card__head flexrow gap-sm">
-				<span class="litm-banner litm-banner--sm">{{localize "LITM.Terms.relationships"}}</span>
-			</legend>
-			{{> systems/litmv2/templates/partials/hero-relationships.html}}
-		</fieldset>
-		{{/if}}
+		{{> fellowshipCard}}
 	</div>
-	{{/if}}
+	{{/unless}}{{/if}}
 
 	<!-- Story Themes -->
 	{{#if storyThemes.length}}
