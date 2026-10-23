@@ -3,8 +3,8 @@
 	{{#if themes.length}}
 	<div class="litm-hero-board__themes">
 		{{#each themes as |theme|}}
-		<fieldset class="theme-card item draggable" data-item-id="{{theme._id}}">
-			<legend class="flexrow gap-xs"><span class="litm-banner theme-card__book">{{theme.system.themebook}}</span>
+		<fieldset class="theme-card item draggable" data-item-id="{{theme._id}}" data-level="{{theme.system.level}}">
+			<legend class="flexrow gap-xs"><span class="litm-banner theme-card__book">{{#if @root.cardsLayout}}<img class="litm--banner-icon" src="{{theme.img}}" alt="{{theme.levelLabel}}" data-tooltip="{{theme.levelLabel}}" />{{/if}}{{theme.system.themebook}}</span>
 				<button type="button" data-action="editItem" data-item-id="{{theme._id}}"
 					data-tooltip="{{localize 'LITM.Ui.click_to_edit_theme'}}"
 					aria-label="{{localize 'LITM.Ui.click_to_edit_theme'}}">
@@ -113,9 +113,9 @@
 	<!-- Fellowship + Relationships -->
 	{{#if hasFellowship}}
 	<div class="litm-hero-board__fellowship">
-		<fieldset data-tour="fellowship-section">
+		<fieldset data-tour="fellowship-section" data-banner="fellowship">
 			<legend class="control flexrow gap-sm">
-				<span class="litm-banner theme-card__book">{{localize "LITM.Terms.fellowship"}}</span>
+				<span class="litm-banner theme-card__book">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}</span>
 				<button type="button" data-action="viewActor" data-actor-id="{{fellowship.actorId}}"
 					data-tooltip="{{localize 'LITM.Ui.click_to_edit_fellowship'}}"
 					aria-label="{{localize 'LITM.Ui.click_to_edit_fellowship'}}">

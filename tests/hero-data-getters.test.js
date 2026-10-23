@@ -299,3 +299,9 @@ describe("HeroData.fellowshipActor", () => {
 		}
 	});
 });
+
+describe("HeroData schema", () => {
+	it("defaults notes to an empty string", () => {
+		expect(HeroData.defineSchema().notes.options.initial).toBe("");
+	});
+});

@@ -28,6 +28,13 @@
 			<i class="fa-solid fa-skull" aria-hidden="true"></i>
 			<span class="litm--play-actions__label">{{localize 'LITM.Ui.roll_sacrifice'}}</span>
 		</button>
+		{{#if isOwner}}
+		<button type="button" data-action="editNotes"
+			data-tooltip="{{localize 'LITM.Ui.notes'}}" aria-label="{{localize 'LITM.Ui.notes'}}">
+			<i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>
+			<span class="litm--play-actions__label">{{localize 'LITM.Ui.notes'}}</span>
+		</button>
+		{{/if}}
 		{{#if showCamping}}
 		<button type="button" data-action="openCamping"
 			data-tooltip="{{localize 'LITM.Ui.camping_open'}}" aria-label="{{localize 'LITM.Ui.camping_open'}}">

@@ -138,6 +138,8 @@ export class HeroData extends LimitsMixin(
 		const fields = foundry.data.fields;
 		return {
 			description: new fields.HTMLField({ initial: "" }),
+			/** Free-form notes. Visible to anyone who can see the actor — not secret. */
+			notes: new fields.HTMLField({ initial: "" }),
 			promise: new fields.NumberField({
 				initial: 0,
 				min: 0,
