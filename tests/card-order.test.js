@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+	FELLOWSHIP_KEY as F,
 	fellowshipSlot,
-	fellowshipSlotAfterDrop,
+	moveCard,
 } from "../modules/sheets/card-order.js";
 
 describe("fellowshipSlot", () => {
@@ -15,14 +16,26 @@ describe("fellowshipSlot", () => {
 	});
 });
 
-describe("fellowshipSlotAfterDrop", () => {
-	// Themes A B C D, Fellowship before C (slot 2).
-	it("lands before a theme to its left", () => {
-		expect(fellowshipSlotAfterDrop(2, 0)).toBe(0);
+describe("moveCard", () => {
+	const row = ["a", "b", F, "c", "d"];
+
+	it("moves a theme past the Fellowship, shifting it", () => {
+		expect(moveCard(row, "a", "c")).toEqual(["b", F, "c", "a", "d"]);
+		expect(moveCard(row, "d", "a")).toEqual(["d", "a", "b", F, "c"]);
 	});
 
-	it("lands after a theme to its right", () => {
-		expect(fellowshipSlotAfterDrop(2, 2)).toBe(3);
-		expect(fellowshipSlotAfterDrop(2, 3)).toBe(4);
+	it("drops a theme onto the Fellowship card", () => {
+		expect(moveCard(row, "a", F)).toEqual(["b", F, "a", "c", "d"]);
+		expect(moveCard(row, "d", F)).toEqual(["a", "b", "d", F, "c"]);
+	});
+
+	it("moves the Fellowship like any card", () => {
+		expect(moveCard(row, F, "a")).toEqual([F, "a", "b", "c", "d"]);
+		expect(moveCard(row, F, "d")).toEqual(["a", "b", "c", "d", F]);
+	});
+
+	it("does nothing on itself or an unknown card", () => {
+		expect(moveCard(row, "a", "a")).toBeNull();
+		expect(moveCard(row, "a", "zz")).toBeNull();
 	});
 });

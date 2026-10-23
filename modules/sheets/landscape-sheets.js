@@ -4,7 +4,7 @@ import { HeroSheet } from "../actor/hero/hero-sheet.js";
 import { JourneySheet } from "../actor/journey/journey-sheet.js";
 import { FLAGS } from "../system/config.js";
 import { LitmActorSheet } from "./base-actor-sheet.js";
-import { fellowshipSlot, fellowshipSlotAfterDrop } from "./card-order.js";
+import { FELLOWSHIP_KEY, fellowshipSlot, moveCard } from "./card-order.js";
 import { isDescriptionShort } from "./description-fit.js";
 
 const LANDSCAPE_OPTIONS = {
@@ -36,13 +36,19 @@ export class HeroSheetLandscape extends HeroSheet {
 export class HeroSheetCards extends HeroSheet {
 	static DEFAULT_OPTIONS = {
 		classes: ["litm-hero-cards"],
+		// Opens as wide as the Landscape sheet, so the themes row fits.
+		position: { width: 1280 },
 		actions: {
 			toggleHeroPanel: HeroSheetCards._onToggleHeroPanel,
+			flipThemeCard: HeroSheetCards._onFlipThemeCard,
 		},
 	};
 
 	/** Class on the sheet root while the wide portrait panel is folded away. */
 	static PANEL_COLLAPSED_CLASS = "litm-hero-cards--panel-collapsed";
+
+	/** Theme cards turned to their back (the note), by `data-flip-key`; kept across re-renders. */
+	#flipped = new Set();
 
 	/** Panel fold state; seeded from the client setting, then kept here so a re-render never snaps back. */
 	#panelCollapsed = null;
@@ -122,6 +128,53 @@ export class HeroSheetCards extends HeroSheet {
 			button.replaceWith(this.#nameText);
 	}
 
+	/**
+	 * Turn a theme card over: the back shows its note. A half-turn out, the
+	 * face swaps, a half-turn back in; no motion when the user asks for less.
+	 * @this {HeroSheetCards}
+	 */
+	static _onFlipThemeCard(_event, target) {
+		const card = target.closest(".theme-card[data-flip-key]");
+		if (!card) return;
+		const key = card.dataset.flipKey;
+		const flipped = !this.#flipped.has(key);
+		if (flipped) this.#flipped.add(key);
+		else this.#flipped.delete(key);
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+			return this.#applyFlip(card, flipped);
+		const turn = (from, to, easing) =>
+			card.animate(
+				[
+					{ transform: `perspective(60rem) rotateY(${from})` },
+					{ transform: `perspective(60rem) rotateY(${to})` },
+				],
+				{ duration: 140, easing },
+			).finished;
+		turn("0deg", "90deg", "ease-in").then(() => {
+			this.#applyFlip(card, flipped);
+			turn("-90deg", "0deg", "ease-out");
+		});
+	}
+
+	/** Show a card's back or face. The back sits under the banner, so it is placed from the banner's measured bottom. */
+	#applyFlip(card, flipped) {
+		// A note deleted while flipped leaves no back: show the face.
+		flipped &&= !!card.querySelector(":scope > .theme-card__back");
+		const legend = card.querySelector(":scope > legend");
+		card.style.setProperty(
+			"--litm-back-top",
+			`${legend.offsetTop + legend.offsetHeight}px`,
+		);
+		card.classList.toggle("is-flipped", flipped);
+		for (const face of card.querySelectorAll(
+			":scope > :not(legend, .theme-card__back)",
+		))
+			face.inert = flipped;
+		card
+			.querySelector("[data-action='flipThemeCard']")
+			?.setAttribute("aria-pressed", String(flipped));
+	}
+
 	/** @override */
 	async _prepareContext(options) {
 		const context = await super._prepareContext(options);
@@ -142,15 +195,18 @@ export class HeroSheetCards extends HeroSheet {
 
 	/** @override */
 	_onDragStart(event) {
-		if (!event.currentTarget.matches("[data-fellowship-card]"))
-			return super._onDragStart(event);
-		event.dataTransfer.setData(
-			"text/plain",
-			JSON.stringify({
-				type: HeroSheetCards.FELLOWSHIP_CARD_DRAG,
-				actorUuid: this.document.uuid,
-			}),
-		);
+		// A card's banner is its drag handle. The item id stays on the card, not
+		// the banner: Foundry's sort reads the drop target's nearest id and its
+		// siblings, which must be the cards.
+		const card = event.currentTarget.closest(".theme-card");
+		if (!card || card === event.currentTarget) return super._onDragStart(event);
+		const data = card.matches("[data-fellowship-card]")
+			? {
+					type: HeroSheetCards.FELLOWSHIP_CARD_DRAG,
+					actorUuid: this.document.uuid,
+				}
+			: this.document.items.get(card.dataset.itemId)?.toDragData();
+		if (data) event.dataTransfer.setData("text/plain", JSON.stringify(data));
 	}
 
 	/** @override */
@@ -160,28 +216,53 @@ export class HeroSheetCards extends HeroSheet {
 		if (data.type !== HeroSheetCards.FELLOWSHIP_CARD_DRAG)
 			return super._onDrop(event);
 		if (data.actorUuid !== this.document.uuid || !this.isEditable) return;
-		const card = event.target.closest(".litm-hero-board__themes > .theme-card");
-		if (!card || card.matches("[data-fellowship-card]")) return;
-		const themeCards = [
-			...card.parentElement.querySelectorAll(
-				":scope > .theme-card:not([data-fellowship-card])",
-			),
-		];
-		const slot = fellowshipSlot(
-			this.document.getFlag("litmv2", FLAGS.fellowshipIndex),
-			themeCards.length,
-		);
-		return this.document.setFlag(
-			"litmv2",
-			FLAGS.fellowshipIndex,
-			fellowshipSlotAfterDrop(slot, themeCards.indexOf(card)),
-		);
+		return this.#sortThemesRow(event, FELLOWSHIP_KEY);
 	}
 
-	/** A theme dropped on the Fellowship card has no item to sort against. */
-	_onSortItem(event, item) {
-		if (event.target.closest("[data-fellowship-card]")) return;
+	/** @override */
+	async _onSortItem(event, item) {
+		if (item.type === "theme" && (await this.#sortThemesRow(event, item.id)))
+			return;
 		return super._onSortItem(event, item);
+	}
+
+	/**
+	 * Reorder the themes row as one sequence, the Fellowship card included,
+	 * then write back the themes' sort and the Fellowship's slot. A theme
+	 * moved past the Fellowship shifts it, as it would any card.
+	 * @param {DragEvent} event
+	 * @param {string} source  The dragged theme's id, or FELLOWSHIP_KEY.
+	 * @returns {Promise<boolean>} False when the drop is outside the row.
+	 */
+	async #sortThemesRow(event, source) {
+		const target = event.target.closest(
+			".litm-hero-board__themes > .theme-card",
+		);
+		if (!target) return false;
+		const keyOf = (card) =>
+			card.matches("[data-fellowship-card]")
+				? FELLOWSHIP_KEY
+				: card.dataset.itemId;
+		const cards = [
+			...target.parentElement.querySelectorAll(":scope > .theme-card"),
+		];
+		const order = moveCard(cards.map(keyOf), source, keyOf(target));
+		if (!order) return true;
+		const themeIds = order.filter((key) => key !== FELLOWSHIP_KEY);
+		await this.document.updateEmbeddedDocuments(
+			"Item",
+			themeIds.map((_id, i) => ({
+				_id,
+				sort: (i + 1) * CONST.SORT_INTEGER_DENSITY,
+			})),
+		);
+		if (order.includes(FELLOWSHIP_KEY))
+			await this.document.setFlag(
+				"litmv2",
+				FLAGS.fellowshipIndex,
+				order.indexOf(FELLOWSHIP_KEY),
+			);
+		return true;
 	}
 
 	/** @override */
@@ -189,6 +270,10 @@ export class HeroSheetCards extends HeroSheet {
 		await super._onRender(context, options);
 		this.#panelCollapsed ??= game.settings.get("litmv2", "heroPanelCollapsed");
 		this.#applyPanelCollapsed(this.#panelCollapsed);
+		for (const card of this.element.querySelectorAll(
+			".theme-card[data-flip-key]",
+		))
+			if (this.#flipped.has(card.dataset.flipKey)) this.#applyFlip(card, true);
 		const box = this.element.querySelector(".litm--hero-description");
 		this.#nameToggle = this.element.querySelector(".litm--hero-name__toggle");
 		this.#nameText = this.#nameToggle

@@ -599,6 +599,7 @@
 			"fellowship_no_theme_edit": "No fellowship theme set up yet. Click the edit button to configure.",
 			"fellowship_setup_cta": "Drop a <em><b>Fellowship</b></em> Themebook or Theme here, or click the book icon to browse available options.",
 			"fellowship_theme_label": "{theme} (Fellowship)",
+			"flip_card": "Flip the card",
 			"from_themebook": "From themebook",
 			"gm_welcome_creation_enabled": "Players can already create actors.",
 			"gm_welcome_creation_granted": "Players can now create actors!",

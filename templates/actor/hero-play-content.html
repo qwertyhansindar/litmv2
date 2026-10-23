@@ -1,11 +1,20 @@
 <section class="litm-hero-board">
+	<!-- Cards: turns a theme card over to its note. -->
+	{{#*inline "flipButton"}}
+	<button type="button" data-action="flipThemeCard" aria-pressed="false"
+		data-tooltip="{{localize 'LITM.Ui.flip_card'}}" aria-label="{{localize 'LITM.Ui.flip_card'}}">
+		<i class="fa-solid fa-rotate" aria-hidden="true"></i>
+	</button>
+	{{/inline}}
+
 	<!-- Fellowship + Relationships: a theme card. Cards renders it in the themes row. -->
 	{{#*inline "fellowshipCard"}}
 	{{#if (and hasFellowship (or relationshipVisible.length fellowship.hasTheme fellowshipActorId))}}
-	<fieldset class="theme-card item{{#if @root.cardsLayout}} draggable{{/if}}"{{#if @root.cardsLayout}} data-fellowship-card{{/if}} data-tour="fellowship-section" data-banner="fellowship"
+	<fieldset class="theme-card item"{{#if @root.cardsLayout}} data-fellowship-card data-flip-key="{{fellowship._id}}"{{else}}
 		data-action="toggleThemeDescription"
-		data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}">
-		<legend class="litm-banner theme-card__book">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}</legend>
+		data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}"{{/if}} data-tour="fellowship-section" data-banner="fellowship">
+		<legend class="litm-banner theme-card__book{{#if @root.cardsLayout}} draggable{{/if}}">{{#if (and @root.cardsLayout fellowship.hasTheme)}}<img class="litm--banner-icon" src="{{fellowship.img}}" alt="{{fellowship.levelLabel}}" data-tooltip="{{fellowship.levelLabel}}" />{{/if}}{{localize "LITM.Terms.fellowship"}}{{#if (and @root.cardsLayout fellowship.hasTheme fellowship.system.description)}}{{> flipButton}}{{/if}}</legend>
+		{{#if (and @root.cardsLayout fellowship.hasTheme fellowship.system.description)}}<div class="theme-card__back">{{{ fellowship.system.description }}}</div>{{/if}}
 		{{#if fellowship.hasTheme}}
 		<div data-fellowship-actor-id="{{fellowship.actorId}}" data-item-id="{{fellowship._id}}">
 			{{> systems/litmv2/templates/partials/theme-card-header.html fellowship noBurn=true}}
@@ -22,7 +31,6 @@
 			<div class="theme-card__lower">
 				{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}
 				{{#if fellowship.system.quest.description}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{fellowship.system.quest.description}}</q></blockquote>{{/if}}
-				{{> systems/litmv2/templates/partials/theme-description.html description=fellowship.system.description id=fellowship._id}}
 				{{> systems/litmv2/templates/partials/theme-special-improvements.html fellowship}}
 			</div>
 			{{else}}
@@ -54,10 +62,11 @@
 	<div class="litm-hero-board__themes">
 		{{#each themes as |theme|}}
 		{{#if (eq @index @root.fellowshipSlot)}}{{> fellowshipCard @root}}{{/if}}
-		<fieldset class="theme-card item{{#if @root.cardsLayout}} draggable{{/if}}"{{#if @root.cardsLayout}} data-item-id="{{theme._id}}"{{/if}} data-id="{{theme._id}}" data-level="{{theme.system.level}}"
+		<fieldset class="theme-card item"{{#if @root.cardsLayout}} data-item-id="{{theme._id}}" data-flip-key="{{theme._id}}"{{else}}
 			data-action="toggleThemeDescription"
-			data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}">
-			<legend class="litm-banner theme-card__book">{{#if @root.cardsLayout}}<img class="litm--banner-icon" src="{{theme.img}}" alt="{{theme.levelLabel}}" data-tooltip="{{theme.levelLabel}}" />{{/if}}{{theme.system.themebook}}</legend>
+			data-tooltip="{{localize 'LITM.Ui.click_toggle_description'}}"{{/if}} data-id="{{theme._id}}" data-level="{{theme.system.level}}">
+			<legend class="litm-banner theme-card__book{{#if @root.cardsLayout}} draggable{{/if}}">{{#if @root.cardsLayout}}<img class="litm--banner-icon" src="{{theme.img}}" alt="{{theme.levelLabel}}" data-tooltip="{{theme.levelLabel}}" />{{/if}}{{theme.system.themebook}}{{#if (and @root.cardsLayout theme.system.description)}}{{> flipButton}}{{/if}}</legend>
+			{{#if (and @root.cardsLayout theme.system.description)}}<div class="theme-card__back">{{{ theme.system.description }}}</div>{{/if}}
 			{{> systems/litmv2/templates/partials/theme-card-header.html theme}}
 
 			{{> systems/litmv2/templates/partials/play-theme-tags.html theme}}
@@ -66,7 +75,6 @@
 			<div class="theme-card__lower">
 				{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}
 				{{#if theme.system.quest.description}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{theme.system.quest.description}}</q></blockquote>{{/if}}
-				{{> systems/litmv2/templates/partials/theme-description.html description=theme.system.description id=theme._id}}
 				{{> systems/litmv2/templates/partials/theme-special-improvements.html theme}}
 			</div>
 			{{else}}
