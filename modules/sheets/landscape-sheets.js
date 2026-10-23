@@ -25,6 +25,24 @@ export class HeroSheetLandscape extends HeroSheet {
 	};
 }
 
+/**
+ * Printed-card hero variant: tags lead, quest and tracks recede, portrait
+ * always framed. Styling lives under `.litm-hero-cards` (litmv2.css §25);
+ * `cardsLayout` switches the few template branches that differ.
+ */
+export class HeroSheetCards extends HeroSheet {
+	static DEFAULT_OPTIONS = {
+		classes: ["litm-hero-cards"],
+	};
+
+	/** @override */
+	async _prepareContext(options) {
+		const context = await super._prepareContext(options);
+		context.cardsLayout = true;
+		return context;
+	}
+}
+
 export class ChallengeSheetLandscape extends ChallengeSheet {
 	static DEFAULT_OPTIONS = LANDSCAPE_OPTIONS;
 }

@@ -25,6 +25,7 @@
    19.  Dark Mode ............... Theme overrides for dark interface
    20.  Active Effect Sheet ..... Simplified tag/status editing
    24.  Narrator's Call ......... GM-initiated roll: move, target, invocations
+   25.  Hero Sheet — Cards ...... Opt-in printed-card hero sheet variant
    (Welcome Overlay styles are in litmv2-welcome.css)
 ======================================== */
 
@@ -8065,4 +8066,153 @@ body.litm--colorblind .themed.theme-dark,
 
 .litm--roll-request-might {
 	font-weight: 600;
+}
+
+/* ========================================
+   25. Hero Sheet — Cards
+   The opt-in "Hero Sheet (Cards)" variant (HeroSheetCards): theme cards
+   read like the printed ones — tags lead, quest and tracks recede, the
+   portrait is always framed. Everything is scoped to .litm-hero-cards so
+   the classic and landscape sheets are untouched; the two neutral rules
+   first keep shared markup looking classic everywhere else.
+   ======================================== */
+
+/* Shared markup, classic look: weaknesses flow inline with power tags,
+   and roll-button labels stay hidden. */
+.litm .theme-card-tags__weaknesses {
+	display: contents;
+}
+
+.litm--play-actions__label {
+	display: none;
+}
+
+/* Weaknesses get their own line beneath the power tags, as on the card. */
+.litm-hero-cards .theme-card-tags__weaknesses {
+	display: flex;
+	flex-wrap: wrap;
+	flex-basis: 100%;
+	gap: inherit;
+}
+
+/* Idle chips are light — a tint with an ink underline — so a card of six
+   tags reads as text, not a wall of highlighter. Power vs weakness stays
+   legible from the tint, the ink and the chevron glyph. */
+.litm-hero-cards
+	.theme-card
+	:is(
+		.litm-power_tag,
+		.litm-fellowship_tag,
+		.litm-relationship_tag,
+		.litm-weakness_tag
+	) {
+	--tag-ink: var(--color-litm-tag-text);
+
+	&::before {
+		content: none;
+	}
+
+	&::after {
+		background: color-mix(in srgb, var(--tag-color) 30%, transparent);
+		border-bottom: 2px solid var(--tag-ink);
+	}
+}
+
+.litm-hero-cards .theme-card .litm-weakness_tag {
+	--tag-ink: var(--color-litm-weakness-text);
+}
+
+/* Tracks: one compact footer line — "ABANDON ◇◇◇ IMPROVE ◇◇◇ MILESTONE ◇◇◇".
+   Bookkeeping, so it recedes below the tags. */
+.litm-hero-cards .theme-card-tracks {
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--spacer-2) var(--spacer-8);
+	margin-top: var(--spacer-4);
+	padding-top: var(--spacer-4);
+	border-top: 1px solid var(--color-border-30);
+}
+
+/* Tracks close the card: pin them to its bottom edge so footers line up
+   across a row of equal-height cards. */
+.litm-hero-cards .theme-card > .theme-card-tracks:last-child {
+	margin-top: auto;
+}
+
+.litm-hero-cards .theme-card-track {
+	flex-direction: row;
+	flex: 0 1 auto;
+	gap: var(--spacer-2);
+}
+
+.litm-hero-cards .theme-card-track .progress-display {
+	justify-content: flex-start;
+}
+
+.litm-hero-cards .theme-card-track .progress-box {
+	--button-size: 18px;
+	min-width: 18px;
+	padding: 2px;
+}
+
+/* Label leads its pips; `order` rather than markup keeps the tracks
+   partial shared with the classic sheet. */
+.litm-hero-cards .theme-card-track label {
+	order: -1;
+	font-size: var(--font-size-10);
+	text-align: start;
+	letter-spacing: 0.04em;
+	color: var(--color-text-secondary);
+}
+
+.litm-hero-cards .theme-card-track .litm--track-action {
+	flex: none;
+	margin: 0;
+}
+
+/* Quest: a quiet line under the tags, never louder than them. */
+.litm-hero-cards .theme-card__quest {
+	margin: var(--spacer-4) 0 0;
+	font-family: var(--font-serif);
+	font-style: italic;
+	font-size: var(--font-size-14);
+}
+
+/* Portrait: always present, framed; a dimmed placeholder until set. */
+.litm-hero-cards .profile-img.litm--play-portrait {
+	width: 7.5rem;
+	height: 7.5rem;
+	align-self: center;
+	margin-left: var(--spacer-8);
+	border: 2px groove var(--color-border);
+}
+
+.litm-hero-cards .profile-img.litm--play-portrait--placeholder {
+	opacity: 0.45;
+	padding: var(--spacer-8);
+	background: var(--color-warm-1-10);
+}
+
+.litm-hero-cards .profile-img.litm--play-portrait--placeholder:not([data-action]) {
+	cursor: default;
+	pointer-events: none;
+}
+
+/* Special improvements show their name only; the description is a tooltip. */
+.litm-hero-cards .special-improvements-list li[data-tooltip]:not(.is-locked) h5 {
+	cursor: help;
+}
+
+/* Roll buttons gain text labels once the sheet has room. */
+@container (min-width: 720px) {
+	.litm-hero-cards .litm--play-actions__buttons button {
+		gap: var(--spacer-8);
+		width: auto;
+		padding-inline: var(--spacer-12);
+	}
+
+	.litm-hero-cards .litm--play-actions__label {
+		display: inline;
+	}
 }

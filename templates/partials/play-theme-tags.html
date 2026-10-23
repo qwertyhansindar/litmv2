@@ -6,11 +6,15 @@
 	{{/unless}}
 	{{/if}}
 	{{/each}}
-	{{#each system.weaknessTags as |tag|}}
-	{{#if tag.name}}
-	{{#unless tag.disabled}}
-	{{> systems/litmv2/templates/partials/play-tag.html tag action=../tagAction noBurn=../noBurn}}
-	{{/unless}}
+	{{#if system.weaknessTags.length}}
+	<div class="theme-card-tags__weaknesses">
+		{{#each system.weaknessTags as |tag|}}
+		{{#if tag.name}}
+		{{#unless tag.disabled}}
+		{{> systems/litmv2/templates/partials/play-tag.html tag action=../tagAction noBurn=../noBurn}}
+		{{/unless}}
+		{{/if}}
+		{{/each}}
+	</div>
 	{{/if}}
-	{{/each}}
 </div>

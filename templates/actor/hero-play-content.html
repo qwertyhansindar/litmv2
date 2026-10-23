@@ -9,13 +9,15 @@
 			<legend class="litm-banner theme-card__book">{{theme.system.themebook}}</legend>
 			{{> systems/litmv2/templates/partials/theme-card-header.html theme}}
 
-			{{> systems/litmv2/templates/partials/play-theme-tags.html theme}} {{>
-			systems/litmv2/templates/partials/theme-special-improvements.html theme}} {{>
-			systems/litmv2/templates/partials/play-theme-tracks.html theme}}
+			{{> systems/litmv2/templates/partials/play-theme-tags.html theme}}
+			{{> systems/litmv2/templates/partials/theme-special-improvements.html theme}}
+			{{#unless @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}{{/unless}}
 
 			<blockquote class="theme-card__quest">{{theme.system.quest.description}}</blockquote>
 
 			{{> systems/litmv2/templates/partials/theme-description.html description=theme.system.description id=theme._id}}
+
+			{{#if @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html theme}}{{/if}}
 		</fieldset>
 		{{/each}}
 	</div>
@@ -108,11 +110,13 @@
 				noBurn=true
 				}}
 				{{> systems/litmv2/templates/partials/theme-special-improvements.html fellowship}}
-				{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}
+				{{#unless @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}{{/unless}}
 
 				<blockquote class="theme-card__quest">{{fellowship.system.quest.description}}</blockquote>
 
 				{{> systems/litmv2/templates/partials/theme-description.html description=fellowship.system.description id=fellowship._id}}
+
+				{{#if @root.cardsLayout}}{{> systems/litmv2/templates/partials/play-theme-tracks.html fellowship}}{{/if}}
 			</div>
 			{{else}}
 			<p class="hint" style="text-align: center">
