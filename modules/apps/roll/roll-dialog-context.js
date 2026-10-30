@@ -733,13 +733,6 @@ export function buildGroupRollTabs(dialog, shared) {
 		});
 	};
 
-	// The Fellowship rolls, so it leads.
-	pushActor(dialog.actor);
-	for (const id of dialog.participantIds) {
-		if (id === dialog.actorId) continue;
-		pushActor(game.actors.get(id));
-	}
-
 	// Story tab: the scene, plus the opposition tracked in the sidebar. Read-only
 	// for players — invoking the opposition is the Narrator's move (p.272).
 	const storyGroups = [];
@@ -765,6 +758,10 @@ export function buildGroupRollTabs(dialog, shared) {
 	const sceneItems = actable
 		? sceneStoryItems.filter((tag) => tag.state)
 		: sceneStoryItems;
+
+	// The Fellowship rolls, so it leads; the Story the whole group faces comes
+	// next. Then the viewer's own Hero, then everyone else's, in roster order.
+	pushActor(dialog.actor);
 	if (sceneItems.length || storyGroups.length) {
 		tabs.push({
 			id: "__story",
@@ -776,6 +773,13 @@ export function buildGroupRollTabs(dialog, shared) {
 			],
 		});
 	}
+	const heroIds = dialog.participantIds.filter((id) => id !== dialog.actorId);
+	const isMine = (id) => !!actable?.has(id);
+	for (const id of [
+		...heroIds.filter(isMine),
+		...heroIds.filter((id) => !isMine(id)),
+	])
+		pushActor(game.actors.get(id));
 
 	seedTabGroup(dialog, tabs);
 	return tabs;
