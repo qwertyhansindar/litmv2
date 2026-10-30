@@ -2212,7 +2212,14 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 		// instance, so a replaced sync is never touched by the timer.
 		const sync = this.#sync;
 		sync.expectReseat();
-		setTimeout(() => sync.abandonReseat(), RESEAT_WINDOW_MS);
+		setTimeout(() => {
+			if (!sync.awaitingReseat) return;
+			sync.abandonReseat();
+			// Nobody held the draft, the whole table reloaded say: publish the
+			// one rebuilt from the flag, so viewers that opened blank get the call.
+			if (this.#sync === sync && this.#syncActive && this.isOwner)
+				this.#sendSync(sync.snapshot());
+		}, RESEAT_WINDOW_MS);
 		Sockets.dispatch("requestRollDialogSync", {
 			actorId: this.actorId,
 			reseat: true,
@@ -2221,7 +2228,13 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 
 	/** A viewer's answer to {@link requestReseat}: its last canonical view. */
 	dispatchReseat() {
-		if (this.localOnly || this.isOwner || !this.#syncActive) return;
+		if (
+			this.localOnly ||
+			this.isOwner ||
+			!this.#syncActive ||
+			!this.#sync.heard
+		)
+			return;
 		this.#sendSync({
 			kind: "reseat",
 			revision: this.#sync.revision,
