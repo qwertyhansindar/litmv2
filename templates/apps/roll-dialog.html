@@ -668,8 +668,10 @@
 			{{#if isOwner}}
 			{{!-- With mandatory approval on, Roll *is* "send to the Narrator",
 			      so the opt-in button beside it would be the same button twice.
-			      The label says where the press goes. --}}
-			{{#unless requiresApproval}}
+			      The label says where the press goes. A Narrator holding the
+			      roll — an Acting Together roll, a call they took over — has
+			      nobody to send it to. --}}
+			{{#unless (or requiresApproval isGM)}}
 			<button type="button" class="flex1" data-action="sendToNarrator">
 				<i class="fa-solid fa-envelope" aria-hidden="true"></i>
 				{{localize "LITM.Ui.send_to_narrator"}}

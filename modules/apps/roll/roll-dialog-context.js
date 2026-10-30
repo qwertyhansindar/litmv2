@@ -44,6 +44,8 @@ export function makeTagDecorator({
 }) {
 	const currentUserId = game.user.id;
 	const isGM = game.user.isGM;
+	// Only the Narrator sees hidden rows, so only they need telling which.
+	const hiddenActorIds = isGM ? StoryTagsStore.hiddenActorIds : new Set();
 	return (tag) => {
 		const contributorId = tag.contributorId || null;
 		// A tag the Narrator invoked when they called for this roll (Core Book
@@ -92,6 +94,8 @@ export function makeTagDecorator({
 				(!isOwner && contributorId && contributorId !== currentUserId),
 			isUnavailable,
 			isNarrator,
+			// Marked with the ✱ every other tag surface uses.
+			isSingleUse: !!(tag.isSingleUse ?? tag.system?.isSingleUse),
 			states,
 			value:
 				tag.type === "status_tag"
@@ -99,6 +103,13 @@ export function makeTagDecorator({
 					: undefined,
 			isPositiveSuggestion: positiveSuggestedIds.has(tagId),
 			isNegativeSuggestion: negativeSuggestedIds.has(tagId),
+			// Hidden by itself, or with its actor's sidebar column.
+			hiddenFromPlayers:
+				isGM &&
+				(!!tag.system?.isHidden ||
+					hiddenActorIds.has(
+						tag.tagActorId ?? /^Actor\.([^.]+)\./.exec(tag.uuid ?? "")?.[1],
+					)),
 		};
 	};
 }

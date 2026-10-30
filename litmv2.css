@@ -8054,8 +8054,10 @@ body.litm--colorblind .themed.theme-dark,
 	font-style: italic;
 }
 
-/* A tag the Narrator invoked: quill mark, and locked for the roller. */
-.litm--roll-dialog-tag-narrator {
+/* A tag the Narrator invoked: quill mark, and locked for the roller. The
+   eye-slash marks, for the Narrator only, a row the players can't see. */
+.litm--roll-dialog-tag-narrator,
+.litm--roll-dialog-tag-hidden {
 	font-size: var(--font-size-11);
 	color: var(--color-litm-tag-text);
 	opacity: 0.8;
