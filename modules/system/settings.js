@@ -55,6 +55,11 @@ export class LitmSettings {
 		return game.settings.get("litmv2", "colorblind_mode");
 	}
 
+	/** This player's roll window look: "classic" or "cards". */
+	static get rollWindowLook() {
+		return game.settings.get("litmv2", "roll_window_look");
+	}
+
 	static get tokenTooltipStatusesOnly() {
 		return game.settings.get("litmv2", "token_tooltip_statuses_only");
 	}
@@ -415,6 +420,19 @@ export class LitmSettings {
 			onChange: (v) => {
 				document.body.classList.toggle("litm--colorblind", !!v);
 			},
+		});
+		// Applies the next time a roll window opens; an open one keeps its look.
+		game.settings.register("litmv2", "roll_window_look", {
+			name: "LITM.Settings.roll_window_look",
+			hint: "LITM.Settings.roll_window_look_hint",
+			scope: "client",
+			config: true,
+			type: String,
+			choices: {
+				classic: "LITM.Settings.roll_window_look_classic",
+				cards: "LITM.Settings.roll_window_look_cards",
+			},
+			default: "classic",
 		});
 		game.settings.register("litmv2", "party_overview_show_all", {
 			scope: "client",
