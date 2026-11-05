@@ -1159,7 +1159,7 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 		if (options.isFirstRender)
 			this.#lookClass = this.localOnly
 				? null
-				: rollLookClass(LitmSettings.rollWindowLook);
+				: rollLookClass(LitmSettings.look);
 		// A re-render can follow a change made elsewhere (a status tier in the
 		// sidebar): rows read live effects, so the total must too.
 		this.#cachedTotalPower = null;

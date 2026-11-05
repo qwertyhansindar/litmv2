@@ -1,5 +1,6 @@
 import { LitmItem } from "../item/litm-item.js";
 import { ACTOR_TYPES } from "../system/config.js";
+import { LitmSettings } from "../system/settings.js";
 import { createLegacyRelationshipEffects } from "./hero/hero-data.js";
 
 /**
@@ -35,6 +36,22 @@ export class LitmActor extends foundry.documents.Actor {
 			(t) => t !== ACTOR_TYPES.fellowship,
 		);
 		return super.createDialog(data, createOptions, dialogOptions);
+	}
+
+	/**
+	 * @override
+	 * The player's Cards look swaps the default hero sheet for its Cards
+	 * version. A sheet picked for this hero in Configure Sheet, or another
+	 * default the Narrator set for heroes, still wins.
+	 */
+	_getSheetClass() {
+		const cls = super._getSheetClass();
+		if (this.type !== ACTOR_TYPES.hero || LitmSettings.look !== "cards")
+			return cls;
+		if (this.getFlag("core", "sheetClass")) return cls;
+		const sheets = CONFIG.Actor.sheetClasses.hero ?? {};
+		if (cls !== sheets["litmv2.HeroSheet"]?.cls) return cls;
+		return sheets["litmv2.HeroSheetCards"]?.cls ?? cls;
 	}
 
 	/**
