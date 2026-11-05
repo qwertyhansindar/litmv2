@@ -130,7 +130,7 @@ export function mightScaleRows() {
 
 /**
  * The class the Cards look is scoped under, from the player's
- * `roll_window_look` setting. Classic gets none, so it cannot change.
+ * `look` setting. Classic gets none, so it cannot change.
  * @param {string} look
  * @returns {string|null}
  */
