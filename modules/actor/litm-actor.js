@@ -38,20 +38,29 @@ export class LitmActor extends foundry.documents.Actor {
 		return super.createDialog(data, createOptions, dialogOptions);
 	}
 
+	/** Default sheet → its Cards version, by actor type. */
+	static CARDS_SHEETS = {
+		[ACTOR_TYPES.hero]: ["litmv2.HeroSheet", "litmv2.HeroSheetCards"],
+		[ACTOR_TYPES.fellowship]: [
+			"litmv2.FellowshipSheet",
+			"litmv2.FellowshipSheetCards",
+		],
+	};
+
 	/**
 	 * @override
-	 * The player's Cards look swaps the default hero sheet for its Cards
-	 * version. A sheet picked for this hero in Configure Sheet, or another
-	 * default the Narrator set for heroes, still wins.
+	 * The player's Cards look swaps the default hero or Fellowship sheet for
+	 * its Cards version. A sheet picked for this actor in Configure Sheet, or
+	 * another default the Narrator set for the type, still wins.
 	 */
 	_getSheetClass() {
 		const cls = super._getSheetClass();
-		if (this.type !== ACTOR_TYPES.hero || LitmSettings.look !== "cards")
-			return cls;
+		const pair = LitmActor.CARDS_SHEETS[this.type];
+		if (!pair || LitmSettings.look !== "cards") return cls;
 		if (this.getFlag("core", "sheetClass")) return cls;
-		const sheets = CONFIG.Actor.sheetClasses.hero ?? {};
-		if (cls !== sheets["litmv2.HeroSheet"]?.cls) return cls;
-		return sheets["litmv2.HeroSheetCards"]?.cls ?? cls;
+		const sheets = CONFIG.Actor.sheetClasses[this.type] ?? {};
+		if (cls !== sheets[pair[0]]?.cls) return cls;
+		return sheets[pair[1]]?.cls ?? cls;
 	}
 
 	/**
