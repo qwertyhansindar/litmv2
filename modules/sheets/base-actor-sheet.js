@@ -596,19 +596,25 @@ export class LitmActorSheet extends LitmSheetMixin(
 			await this.document.createEmbeddedDocuments("ActiveEffect", [
 				statusTagEffect({ name: game.i18n.localize("LITM.Terms.status") }),
 			]);
-		} else if (isStatus) {
+		} else if ("promptName" in target.dataset) {
 			// The play board has no inline name field, so ask for one up front.
+			const title = isStatus ? "LITM.Ui.add_status" : "LITM.Ui.add_tag";
 			const result = await foundry.applications.api.DialogV2.input({
-					window: { title: game.i18n.localize("LITM.Ui.add_status") },
+					window: { title: game.i18n.localize(title) },
 					content: `<div class="form-group">
-						<label for="litm-status-name">${game.i18n.localize("LITM.Ui.status_name")}</label>
-						<input id="litm-status-name" name="name" type="text" required autofocus />
+						<label for="litm-tag-name">${game.i18n.localize(isStatus ? "LITM.Ui.status_name" : "LITM.Ui.tag_name")}</label>
+						<input id="litm-tag-name" name="name" type="text" required autofocus />
 					</div>`,
-					ok: { label: game.i18n.localize("LITM.Ui.add_status") },
+					ok: { label: game.i18n.localize(title) },
 					rejectClose: false,
 				});
 			const input = result?.name?.trim();
 			if (!input) return;
+			if (!isStatus) {
+				await this.document.system.addStoryTag(storyTagEffect({ name: input }));
+				this._notifyStoryTags();
+				return;
+			}
 			// Read "name-N" as the story-tag sidebar's quick-add does: a status
 			// named "name" at tier N. Anything else is the name as typed.
 			const parsed = parseQuickAddInput(input);

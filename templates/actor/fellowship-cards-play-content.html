@@ -3,7 +3,7 @@
 	     Fellowship theme and the story themes, all one row of cards. -->
 	<div class="litm-hero-board__story-grid">
 		<fieldset class="theme-card litm-fellowship-tags" data-banner="kit">
-			<legend class="litm-banner theme-card__book"><i class="litm--banner-icon fa-solid fa-tags" aria-hidden="true"></i><span class="theme-card__banner-tag">{{localize "LITM.Terms.story_tags_statuses"}}</span></legend>
+			<legend class="litm-banner theme-card__book">{{> "systems/litmv2/templates/partials/banner-icon.html" glyph="fa-tag" action="addStoryTag" tagType="story_tag" promptName=true label=(localize "LITM.Ui.add_tag")}}{{> "systems/litmv2/templates/partials/banner-icon.html" glyph="fa-droplet" action="addStoryTag" tagType="status_tag" promptName=true label=(localize "LITM.Ui.add_status")}}<span class="theme-card__banner-tag">{{localize "LITM.Terms.story_tags_statuses"}}</span></legend>
 			{{#if storyTags.length}}
 			<div class="litm-fellowship-tags__chips flexrow">
 				{{#each storyTags as |tag|}}
