@@ -7,6 +7,7 @@
 			{{#if storyTags.length}}
 			<div class="litm-fellowship-tags__chips flexrow">
 				{{#each storyTags as |tag|}}
+				{{#if tag.hidden}}<span class="noflex litm--hidden-wrap">{{/if}}
 				{{#if (eq tag.type "status_tag")}}
 				<span class="noflex litm-status{{#if tag.hidden}} litm--tag-hidden{{/if}}" data-tag-type="{{tag.type}}"
 					data-tag-id="{{tag.id}}" draggable="true" tabindex="0"
@@ -15,6 +16,7 @@
 				<span class="noflex litm-story_tag{{#if tag.hidden}} litm--tag-hidden{{/if}}" data-tag-type="{{tag.type}}"
 					data-tag-id="{{tag.id}}" draggable="true" tabindex="0" data-text="{{tag.name}}">{{tag.name}}</span>
 				{{/if}}
+				{{#if tag.hidden}}{{> "systems/litmv2/templates/partials/hidden-mark.html"}}</span>{{/if}}
 				{{/each}}
 			</div>
 			{{else}}
