@@ -7255,6 +7255,8 @@ body.litm--colorblind .themed.theme-dark,
 }
 
 .litm-camping-scene__duration-field {
+	/* The scene hint beside it is long; shrinking here collapses the select. */
+	flex: none;
 	display: inline-flex;
 	align-items: center;
 	gap: var(--spacer-8);
