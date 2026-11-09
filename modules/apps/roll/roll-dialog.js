@@ -93,6 +93,7 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 			sendToNarrator: LitmRollDialog.#onSendToNarrator,
 			narratorCommand: LitmRollDialog.#onNarratorCommand,
 			mightStep: LitmRollDialog.#onMightStep,
+			graceToggle: LitmRollDialog.#onGraceToggle,
 			toggleMightPicker: LitmRollDialog.#onToggleMightPicker,
 			pickMight: LitmRollDialog.#onPickMight,
 			"spend-half": LitmRollDialog.#onSpendHalf,
@@ -213,6 +214,14 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 
 	static #onMightStep(_event, target) {
 		this.#setMight(this.#might + Number(target.dataset.step));
+	}
+
+	/** The Cards caption's Secret Grace: the Narrator's, the Hero's whole tier or none. */
+	static #onGraceToggle() {
+		if (!game.user.isGM) return;
+		this.#setSacrificeBonus(
+			this.#sacrificeBonus ? 0 : secretGraceTier(this.actor) || 0,
+		);
 	}
 
 	/** Anyone may open the table; only whoever sets the Might picks in it. */
@@ -2195,6 +2204,7 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 			".litm--roll-dialog-tags-column",
 			isSacrifice && !root.querySelector(".litm--sacrifice-theme-fieldset"),
 		);
+		toggle(".litm--grace-control", !isSacrifice);
 		// The Cards caption's Might control and picker sit outside the fieldset.
 		toggle(
 			".litm--roll-dialog-chips, .litm--might-control, .litm--might-picker",
@@ -2246,13 +2256,19 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 			this.#restoreRadio("sacrificeBonus", this.#sacrificeBonus);
 			return;
 		}
-		this.#sacrificeBonus = Number(target.value) || 0;
+		this.#setSacrificeBonus(Number(target.value) || 0);
+	}
+
+	#setSacrificeBonus(bonus) {
+		this.#sacrificeBonus = bonus;
 		for (const label of this.element.querySelectorAll(".litm--grace-option"))
 			label.classList.toggle(
 				"is-active",
-				label.querySelector("input")?.value === String(this.#sacrificeBonus),
+				label.querySelector("input")?.value === String(bonus),
 			);
 		this.#updateTotalPower();
+		for (const el of this.element.querySelectorAll("[data-update='graceValue']"))
+			el.textContent = bonus > 0 ? `+${bonus}` : `${bonus}`;
 		this.#dispatchUpdate();
 	}
 

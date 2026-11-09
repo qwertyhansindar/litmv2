@@ -113,6 +113,24 @@
 				</span>
 				<small class="litm--might-name" data-update="mightName" aria-hidden="true">{{mightName}}</small>
 			</span>
+			{{!-- Secret Grace takes the Might's cell during a Sacrifice (the Classic
+			      block is not rendered here). The Narrator's alone, used whole or
+			      not at all (Vol. II p.78): the value toggles between nothing and
+			      the Hero's tier, and the dove opens the Hero's Secret Grace. --}}
+			{{#if isGM}}
+			<span class="litm--grace-control hidden">
+				<span class="litm--might-steps">
+					<button type="button" class="litm--might-value litm--grace-value" data-action="graceToggle"
+						data-tooltip="{{localize 'LITM.Ui.secret_grace_hero_tier' tier=heroGraceTier}}"
+						aria-label="{{graceLabel}}" aria-pressed="{{#if sacrificeBonus}}true{{else}}false{{/if}}"
+						{{#unless heroGraceTier}}disabled aria-disabled="true"{{/unless}}>
+						<strong data-update="graceValue">{{#if (gt sacrificeBonus 0)}}+{{/if}}{{sacrificeBonus}}</strong>
+					</button>
+				</span>
+				<small class="litm--might-name"><button type="button" class="litm--grace-open" data-action="openSecretGrace"
+					data-tooltip="{{localize 'LITM.Ui.sacrifice_grace'}}" aria-label="{{localize 'LITM.Ui.sacrifice_grace'}}"><i class="fa-solid fa-dove" aria-hidden="true"></i></button> {{graceLabel}}</small>
+			</span>
+			{{/if}}
 			<span class="litm--roll-caption-info">
 				{{#if narratorCall}}
 				<span class="litm--roll-caption-call">
@@ -250,7 +268,7 @@
 			     Narrator alone: the player learns the number from the roll card.
 			     Like a status, it is used whole or not at all — the Hero's tier,
 			     or nothing (Vol. II p.78). --}}
-			{{#if isGM}}
+			{{#if (and isGM (not isCardsLook))}}
 			<div class="litm--sacrifice-grace hidden">
 				<div class="litm--might-label-row">
 					<span class="litm--might-name-wrapper" data-tooltip="{{graceHint}}">

@@ -10650,7 +10650,8 @@ body.litm--colorblind .application.litm--roll-cards {
 	text-align: end;
 }
 
-.litm--might-control {
+.litm--might-control,
+.litm--grace-control {
 	display: inline-flex;
 	flex-direction: column;
 	align-items: center;
@@ -10715,6 +10716,29 @@ body.litm--colorblind .application.litm--roll-cards {
 		line-height: 1;
 	}
 
+}
+
+/* Secret Grace in the Might's cell: the same box, read-only value, weakness
+   tone as it is a price paid rather than Power. */
+.litm--roll-cards .litm--grace-value {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 4em;
+	height: 1.8rem;
+	border: 1px solid var(--color-litm-weakness-text);
+	border-radius: var(--radius-md);
+	font-variant-numeric: tabular-nums;
+
+	& strong {
+		font-size: var(--font-size-18);
+		line-height: 1;
+	}
+}
+
+.litm--roll-cards .litm--grace-control .litm--might-name i {
+	color: var(--color-litm-weakness-text);
 }
 
 /* A player opens the table to read it; picking is the Narrator's. */
