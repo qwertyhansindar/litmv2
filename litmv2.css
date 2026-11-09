@@ -10831,7 +10831,10 @@ body.litm--colorblind .application.litm--roll-cards {
 
 	&.is-selected {
 		border-color: var(--color-warm-1);
-		box-shadow: var(--shadow-glow);
+		/* --shadow-glow is a dark shadow; the chosen theme gets a warm halo. */
+		box-shadow:
+			0 0 0 1px var(--color-warm-1),
+			0 0 14px var(--color-warm-1-25);
 	}
 
 	&:focus-visible {
