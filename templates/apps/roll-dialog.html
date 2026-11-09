@@ -25,6 +25,37 @@
 	</div>
 </div>
 {{/inline}}
+{{#*inline "sacrificeLevelBody"}}
+	<div class="litm--roll-type-bar litm--sacrifice-level-bar" role="radiogroup" aria-label="{{localize 'LITM.Ui.sacrifice_level'}}">
+		{{#each sacrificeLevelOptions as |opt|}}
+		<label class="litm--segmented-option litm--roll-type-option {{#if opt.selected}}is-active{{/if}}"
+			data-action="setSacrificeLevel"
+			data-level="{{opt.value}}"
+			data-tooltip="{{opt.description}}"
+			aria-label="{{opt.label}} — {{opt.description}}">
+			<input type="radio" name="sacrificeLevel" value="{{opt.value}}" {{checked opt.selected}}
+				{{#unless @root.canEditSacrifice}}disabled aria-disabled="true"{{/unless}} />
+			<span>{{opt.label}}</span>
+		</label>
+		{{/each}}
+	</div>
+	{{#each sacrificeLevelOptions as |opt|}}
+	<dl class="litm--sacrifice-terms {{#unless opt.selected}}hidden{{/unless}}" data-level="{{opt.value}}">
+		<dt>{{localize "LITM.Ui.sacrifice_terms_gain"}}</dt>
+		<dd>{{opt.gain}}</dd>
+		<dt>{{localize "LITM.Ui.sacrifice_terms_price"}}</dt>
+		<dd>{{opt.description}}</dd>
+		<dt>{{localize "LITM.Ui.sacrifice_terms_miracle"}}</dt>
+		<dd>{{opt.miracle}}</dd>
+	</dl>
+	{{/each}}
+{{/inline}}
+{{#*inline "sacrificeGraveBody"}}
+	<p class="hint">{{localize "LITM.Ui.sacrifice_grave_status_hint" tier=maxStatusTier}}</p>
+	<input type="text" name="sacrificeStatusName" value="{{sacrificeStatusName}}"
+		placeholder="{{localize 'LITM.Ui.sacrifice_grave_default'}}"
+		{{#unless canEditSacrifice}}disabled aria-disabled="true"{{/unless}} />
+{{/inline}}
 <div class="standard-form litm--roll-dialog-body">
 	<input type="hidden" name="actorId" value="{{actorId}}">
 
@@ -371,39 +402,25 @@
 
 		{{#if showSacrifice}}
 		<!-- Sacrifice Level & Theme: the roller's, shown read-only to the Narrator -->
+		{{#if isCardsLook}}
+		<div class="litm--sacrifice-level-fieldset litm--roll-dialog-section-break hidden">
+			<p class="litm--roll-dialog-actor-label"><i class="fa-solid fa-skull" aria-hidden="true"></i><span>{{localize "LITM.Ui.sacrifice_level"}}</span></p>
+			{{> sacrificeLevelBody}}
+		</div>
+		<div class="litm--sacrifice-grave-fieldset litm--roll-dialog-section-break hidden">
+			<p class="litm--roll-dialog-actor-label"><i class="fa-solid fa-skull-crossbones" aria-hidden="true"></i><span>{{localize "LITM.Ui.sacrifice_grave_label"}}</span></p>
+			{{> sacrificeGraveBody}}
+		</div>
+		{{else}}
 		<fieldset class="litm--sacrifice-level-fieldset hidden">
 			<legend>{{localize "LITM.Ui.sacrifice_level"}}</legend>
-			<div class="litm--roll-type-bar litm--sacrifice-level-bar" role="radiogroup" aria-label="{{localize 'LITM.Ui.sacrifice_level'}}">
-				{{#each sacrificeLevelOptions as |opt|}}
-				<label class="litm--segmented-option litm--roll-type-option {{#if opt.selected}}is-active{{/if}}"
-					data-action="setSacrificeLevel"
-					data-level="{{opt.value}}"
-					data-tooltip="{{opt.description}}"
-					aria-label="{{opt.label}} — {{opt.description}}">
-					<input type="radio" name="sacrificeLevel" value="{{opt.value}}" {{checked opt.selected}}
-						{{#unless @root.canEditSacrifice}}disabled aria-disabled="true"{{/unless}} />
-					<span>{{opt.label}}</span>
-				</label>
-				{{/each}}
-			</div>
-			{{#each sacrificeLevelOptions as |opt|}}
-			<dl class="litm--sacrifice-terms {{#unless opt.selected}}hidden{{/unless}}" data-level="{{opt.value}}">
-				<dt>{{localize "LITM.Ui.sacrifice_terms_gain"}}</dt>
-				<dd>{{opt.gain}}</dd>
-				<dt>{{localize "LITM.Ui.sacrifice_terms_price"}}</dt>
-				<dd>{{opt.description}}</dd>
-				<dt>{{localize "LITM.Ui.sacrifice_terms_miracle"}}</dt>
-				<dd>{{opt.miracle}}</dd>
-			</dl>
-			{{/each}}
+			{{> sacrificeLevelBody}}
 		</fieldset>
 		<fieldset class="litm--sacrifice-grave-fieldset hidden">
 			<legend>{{localize "LITM.Ui.sacrifice_grave_label"}}</legend>
-			<p class="hint">{{localize "LITM.Ui.sacrifice_grave_status_hint" tier=maxStatusTier}}</p>
-			<input type="text" name="sacrificeStatusName" value="{{sacrificeStatusName}}"
-				placeholder="{{localize 'LITM.Ui.sacrifice_grave_default'}}"
-				{{#unless canEditSacrifice}}disabled aria-disabled="true"{{/unless}} />
+			{{> sacrificeGraveBody}}
 		</fieldset>
+		{{/if}}
 		{{/if}}
 		</div>
 		{{/if}}
@@ -436,11 +453,66 @@
 		{{!-- A Sacrifice adds no tags; its theme cards take their place, for
 		     the Narrator too (read-only). --}}
 		{{#if showSacrifice}}
+		{{#if isCardsLook}}
+		<div class="litm--sacrifice-theme-fieldset litm--roll-dialog-section-break hidden">
+			<p class="litm--roll-dialog-actor-label"><i class="fa-solid fa-skull" aria-hidden="true"></i><span>{{sacrificeThemeLegend}}</span></p>
+		{{else}}
 		<fieldset class="litm--sacrifice-theme-fieldset hidden">
 			<legend>{{sacrificeThemeLegend}}</legend>
+		{{/if}}
 			{{#if sacrificeThemeHint}}<p class="hint">{{sacrificeThemeHint}}</p>{{/if}}
 			<div class="litm--sacrifice-theme-grid {{#if (eq sacrificeLevel 'painful')}}painful-mode{{/if}}" role="radiogroup" aria-label="{{localize 'LITM.Ui.sacrifice_choose_theme'}}">
 				{{#each sacrificeThemes as |t|}}
+				{{#if @root.isCardsLook}}
+				<div class="litm--sacrifice-theme-card litm--roll-dialog-theme-group {{#if t.selected}}is-selected{{/if}} {{#if t.spent}}is-spent{{/if}}"
+					data-action="selectSacrificeTheme"
+					data-theme-id="{{t.id}}"
+					data-spent="{{#if t.spent}}true{{else}}false{{/if}}"
+					data-level="{{t.level}}"
+					role="radio"
+					{{#if @root.canEditSacrifice}}tabindex="0"{{else}}aria-disabled="true"{{/if}}
+					aria-checked="{{#if t.selected}}true{{else}}false{{/if}}">
+					<div class="litm--roll-dialog-actor-label">
+						{{#if t.icon}}<img src="{{t.icon}}" alt="{{t.levelLabel}}" data-tooltip="{{t.levelLabel}}" />{{/if}}
+						<span class="litm--roll-plaque-name {{#if t.titleScratched}}is-scratched{{/if}}">{{t.name}}</span>
+					</div>
+					{{#if t.spent}}<span class="litm--sacrifice-theme-spent-note">{{localize 'LITM.Ui.sacrifice_theme_spent'}}</span>{{/if}}
+					{{#if t.hasTags}}
+					<ul class="plain litm--roll-dialog-tags-summary">
+						{{#each t.powerTags}}
+						<li><span class="litm--roll-dialog-tag {{#if scratched}}is-scratched{{/if}}"><span class="litm--roll-dialog-badge litm-power_tag" data-text="{{name}}">{{name}}</span></span></li>
+						{{/each}}
+						{{#each t.weaknessTags}}
+						<li><span class="litm--roll-dialog-tag"><span class="litm--roll-dialog-badge litm-weakness_tag" data-text="{{this}}">{{this}}</span></span></li>
+						{{/each}}
+					</ul>
+					{{/if}}
+					<div class="litm--sacrifice-theme-lower">
+						<div class="theme-card-tracks">
+							{{#each t.tracks}}
+							<div class="theme-card-track">
+								<div class="progress-display" role="group" aria-label="{{label}}">
+									{{#each pips}}
+									<span class="progress-box litm--track-pip-readonly">
+										<img src="systems/litmv2/assets/media/checkbox{{ifThen filled '-c' ''}}.svg" alt="" aria-hidden="true" />
+									</span>
+									{{/each}}
+								</div>
+								<label>{{label}}</label>
+							</div>
+							{{/each}}
+						</div>
+						{{#if t.quest}}<blockquote class="theme-card__quest"><span class="theme-card__quest-label">{{localize 'LITM.Terms.quest'}}</span><q>{{t.quest}}</q></blockquote>{{/if}}
+						{{#if t.specialImprovements.length}}
+						<ul class="plain litm--sacrifice-theme-improvements">
+							{{#each t.specialImprovements}}
+							<li><i class="fa-solid fa-medal" aria-hidden="true"></i> {{this}}</li>
+							{{/each}}
+						</ul>
+						{{/if}}
+					</div>
+				</div>
+				{{else}}
 				<fieldset class="theme-card {{#if t.selected}}is-selected{{/if}} {{#if t.spent}}is-spent{{/if}}"
 					data-action="selectSacrificeTheme"
 					data-theme-id="{{t.id}}"
@@ -486,9 +558,14 @@
 					</div>
 					{{#if t.quest}}<blockquote class="theme-card__quest">{{t.quest}}</blockquote>{{/if}}
 				</fieldset>
+				{{/if}}
 				{{/each}}
 			</div>
+		{{#if isCardsLook}}
+		</div>
+		{{else}}
 		</fieldset>
+		{{/if}}
 		{{/if}}
 
 		<!-- Tags Summary -->

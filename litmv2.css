@@ -10741,6 +10741,180 @@ body.litm--colorblind .application.litm--roll-cards {
 	color: var(--color-litm-weakness-text);
 }
 
+/* Sacrifice sections: kit cards (the section-break card and its plaque come
+   from the tag board's rules above), with the level's terms set as the
+   Cards sheet sets a theme's lower panel. */
+.litm.litm--roll-cards .litm--sacrifice-level-fieldset,
+.litm.litm--roll-cards .litm--sacrifice-grave-fieldset,
+.litm.litm--roll-cards .litm--sacrifice-theme-fieldset {
+	gap: var(--spacer-8);
+	padding: 0 var(--spacer-12) var(--spacer-12);
+}
+
+.litm--roll-cards .litm--sacrifice-level-bar {
+	margin: 0;
+	background: none;
+	border-color: var(--litm-card-border);
+}
+
+.litm--roll-cards .litm--sacrifice-terms {
+	margin: 0;
+	grid-template-columns: 5.5rem minmax(0, 1fr);
+	gap: var(--spacer-8) var(--spacer-12);
+	font-family: var(--font-serif);
+	font-size: var(--font-size-14);
+
+	& dt {
+		align-self: baseline;
+		font-size: var(--font-size-12);
+		font-weight: normal;
+		font-variant-caps: small-caps;
+		letter-spacing: 0.15em;
+		color: var(--color-text-secondary);
+	}
+
+	& dd {
+		align-self: baseline;
+		font-family: var(--font-serif);
+	}
+}
+
+.litm--roll-cards .litm--sacrifice-grave-fieldset {
+	& .hint {
+		margin: 0;
+		text-align: center;
+		font-family: var(--font-serif);
+		font-style: italic;
+		color: var(--color-text-secondary);
+	}
+
+	/* Reads as the status chip it will become. */
+	& input[name="sacrificeStatusName"] {
+		text-align: center;
+		font-family: var(--font-serif);
+		color: var(--litm-card-ink);
+		background: var(--color-litm-might-adventure-bg);
+		border: 1px solid var(--litm-card-border);
+		border-radius: var(--radius-md);
+	}
+}
+
+/* Theme cards: the roll window's own cards, read-only, picked by a click. */
+.litm--roll-cards .litm--sacrifice-theme-grid {
+	gap: var(--spacer-12);
+}
+
+.litm--roll-cards .litm--sacrifice-theme-card {
+	min-width: 0;
+	cursor: pointer;
+	transition:
+		border-color var(--transition-slow),
+		box-shadow var(--transition-slow);
+
+	&.is-selected {
+		border-color: var(--color-warm-1);
+		box-shadow: var(--shadow-glow);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--color-warm-1);
+		outline-offset: 2px;
+	}
+
+	&[aria-disabled="true"] {
+		cursor: default;
+	}
+
+	&.is-spent {
+		opacity: 0.55;
+	}
+
+	& .litm--sacrifice-theme-spent-note {
+		margin: 0 0 var(--spacer-4);
+		text-align: center;
+	}
+
+	/* Tags are only read here: the row is no control. */
+	& .litm--roll-dialog-tag {
+		cursor: inherit;
+	}
+
+	& .litm--roll-plaque-name.is-scratched {
+		text-decoration: line-through;
+	}
+}
+
+.litm--roll-cards .litm--sacrifice-theme-grid.painful-mode .litm--sacrifice-theme-card.is-spent {
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+.litm--roll-cards .litm--sacrifice-theme-lower {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacer-8);
+	padding: var(--spacer-4) var(--spacer-8) 0;
+
+	& .theme-card-tracks {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--spacer-8) var(--spacer-12);
+	}
+
+	& .theme-card-track {
+		flex-direction: column;
+		align-items: center;
+		gap: var(--spacer-2);
+
+		& .progress-display {
+			flex-wrap: nowrap;
+		}
+
+		& label {
+			font-family: var(--font-serif);
+			font-size: var(--font-size-12);
+			font-weight: 500;
+			font-variant-caps: small-caps;
+			text-transform: none;
+			letter-spacing: 0.02em;
+			color: var(--color-text-secondary);
+		}
+	}
+
+	& .theme-card__quest {
+		margin: 0;
+		padding: 0;
+		border: none;
+		text-align: center;
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: var(--font-size-14);
+		color: var(--color-text-primary);
+
+		& q {
+			quotes: "\201C" "\201D";
+		}
+	}
+
+	& .theme-card__quest-label {
+		display: block;
+		margin: 0 calc(-1 * var(--spacer-8)) var(--spacer-4);
+		padding: 1px var(--spacer-12);
+		background: color-mix(in srgb, var(--litm-banner-bg) 22%, transparent);
+		font-size: var(--font-size-11);
+		font-style: normal;
+		font-variant-caps: small-caps;
+		letter-spacing: 0.2em;
+		color: var(--color-text-secondary);
+	}
+
+	& .litm--sacrifice-theme-improvements {
+		margin: 0;
+		font-size: var(--font-size-12);
+		text-align: center;
+	}
+}
+
 /* A player opens the table to read it; picking is the Narrator's. */
 .litm--might-picker.is-readonly .litm--might-pick {
 	pointer-events: none;
