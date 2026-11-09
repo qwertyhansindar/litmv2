@@ -10718,45 +10718,14 @@ body.litm--colorblind .application.litm--roll-cards {
 
 }
 
-/* Secret Grace in the Might's cell: the same box, read-only value, weakness
-   tone as it is a price paid rather than Power. */
-.litm--roll-cards .litm--grace-value {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	box-sizing: border-box;
-	width: 4em;
-	height: 1.8rem;
-	border: 1px solid var(--color-litm-weakness-text);
-	border-radius: var(--radius-md);
-	font-variant-numeric: tabular-nums;
-
-	& strong {
-		font-size: var(--font-size-18);
-		line-height: 1;
-	}
-}
-
+/* Secret Grace takes the Might's cell and its box; only the dove marks it.
+   A player reads the value, so their box is not a control. */
 .litm--roll-cards .litm--grace-control .litm--might-name i {
 	color: var(--color-litm-weakness-text);
 }
 
-/* The Narrator's way into the Hero's Secret Grace: the dove itself. */
-.litm--roll-cards .litm--grace-open {
-	display: inline;
-	width: auto;
-	height: auto;
-	min-height: 0;
-	padding: 0;
-	border: none;
-	background: none;
-	line-height: inherit;
-	cursor: pointer;
-
-	&:hover i,
-	&:focus-visible i {
-		color: var(--color-litm-tag-text);
-	}
+.litm--roll-cards button.litm--grace-value[aria-disabled="true"] {
+	cursor: default;
 }
 
 /* Sacrifice sections: kit cards (the section-break card and its plaque come
@@ -10767,6 +10736,113 @@ body.litm--colorblind .application.litm--roll-cards {
 .litm.litm--roll-cards .litm--sacrifice-theme-fieldset {
 	gap: var(--spacer-8);
 	padding: 0 var(--spacer-12) var(--spacer-12);
+}
+
+/* The Sacrifice level as the tag tabs' stripe: icon and name, the chosen one
+   underlined like the active tab. The radio stays for the keyboard. */
+.litm--roll-cards .litm--sacrifice-level-tabs {
+	/* A row of its own across the window, where the tag tabs sit, rather
+	   than a column beside the level's card in the wrapping settings row. */
+	.litm--roll-dialog-settings > & {
+		flex: 0 0 100%;
+	}
+
+	align-self: start;
+	margin-block-end: var(--spacer-4);
+
+	& .item {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--spacer-4);
+		cursor: pointer;
+		white-space: nowrap;
+	}
+
+	& input {
+		position: absolute;
+		inset: 0;
+		margin: 0;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	& .item.is-active span {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+
+	& .item.is-active i {
+		color: var(--color-litm-weakness-text);
+	}
+
+	& .item:has(input:focus-visible) {
+		outline: 2px solid var(--color-warm-1);
+		outline-offset: 2px;
+	}
+}
+
+/* A plaque straddles its card's top edge: leave it room below the card above. */
+.litm.litm--roll-cards .litm--sacrifice-grave-fieldset,
+.litm.litm--roll-cards .litm--sacrifice-theme-fieldset {
+	margin-top: calc(var(--litm-banner-overhang) + var(--spacer-8));
+}
+
+/* A theme's tags as the Cards sheet lays them: one centred chip per ruled
+   line, weaknesses after a small gap (mirrors .litm--printed-cards). */
+.litm--roll-cards .litm--sacrifice-theme-tags {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	gap: 0;
+
+	& .theme-card-tag-row {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		padding: var(--spacer-4);
+		border-bottom: 1px solid var(--litm-card-rule);
+	}
+
+	& .theme-card-tags__weaknesses {
+		display: flex;
+		flex-direction: column;
+		margin-top: var(--spacer-8);
+	}
+
+	/* Chips as light as the Cards sheet's: a partial tint, no stroked halo. */
+	--litm-chip-mix: 100%;
+
+	& :is(.litm-power_tag, .litm-weakness_tag) {
+		&::before {
+			content: none;
+		}
+
+		&::after {
+			background: color-mix(in srgb, var(--tag-color) var(--litm-chip-mix), transparent);
+		}
+
+		&.scratched::after {
+			background: color-mix(in srgb, var(--tag-color) 20%, transparent);
+		}
+	}
+
+	/* The scratch.svg glyph of a scratched chip, as play-tag.html draws it. */
+	& .litm-tag-scratch {
+		width: 1em;
+		height: 1em;
+		margin-inline-start: var(--spacer-4);
+		flex-shrink: 0;
+		background-color: currentColor;
+		-webkit-mask: url("assets/media/icons/scratch.svg") center / contain no-repeat;
+		mask: url("assets/media/icons/scratch.svg") center / contain no-repeat;
+	}
+}
+
+:is(body.theme-dark, .themed.theme-dark) .litm--roll-cards:not(.theme-light) .litm--sacrifice-theme-tags,
+.litm--roll-cards:is(.themed.theme-dark) .litm--sacrifice-theme-tags {
+	--litm-chip-mix: 50%;
 }
 
 .litm--roll-cards .litm--sacrifice-level-bar {
@@ -10819,7 +10895,10 @@ body.litm--colorblind .application.litm--roll-cards {
 
 /* Theme cards: the roll window's own cards, read-only, picked by a click. */
 .litm--roll-cards .litm--sacrifice-theme-grid {
+	/* The tag board's grid, so a theme here is the size it is there. */
+	grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
 	gap: var(--spacer-12);
+	align-items: start;
 }
 
 .litm--roll-cards .litm--sacrifice-theme-card {
@@ -10880,6 +10959,11 @@ body.litm--colorblind .application.litm--roll-cards {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: var(--spacer-8) var(--spacer-12);
+	}
+
+	/* The Special Improvements label, centred like the Quest's. */
+	& > .theme-card__quest-label {
+		text-align: center;
 	}
 
 	& .theme-card-track {

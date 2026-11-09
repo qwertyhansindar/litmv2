@@ -2197,8 +2197,11 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 		const hideBonus = isSacrifice && !game.user.isGM;
 		toggle(".litm--roll-dialog-modifiers, .litm--roll-dialog-total-power", hideBonus);
 		toggle(".litm--sacrifice-grace", !isSacrifice);
-		toggle(".litm--sacrifice-level-fieldset", !isSacrifice);
-		toggle(".litm--roll-dialog-tags-fieldset, .litm--roll-dialog-tabs", isSacrifice);
+		toggle(".litm--sacrifice-level-fieldset, .litm--sacrifice-level-tabs", !isSacrifice);
+		toggle(
+			".litm--roll-dialog-tags-fieldset, .litm--roll-dialog-tabs:not(.litm--sacrifice-level-tabs)",
+			isSacrifice,
+		);
 		// Only the roller has theme cards; anyone else's tag column is empty.
 		toggle(
 			".litm--roll-dialog-tags-column",
@@ -2266,9 +2269,11 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 				"is-active",
 				label.querySelector("input")?.value === String(bonus),
 			);
-		this.#updateTotalPower();
 		for (const el of this.element.querySelectorAll("[data-update='graceValue']"))
 			el.textContent = bonus > 0 ? `+${bonus}` : `${bonus}`;
+		for (const el of this.element.querySelectorAll(".litm--grace-value"))
+			el.dataset.sign = bonus > 0 ? "1" : "0";
+		this.#updateTotalPower();
 		this.#dispatchUpdate();
 	}
 
