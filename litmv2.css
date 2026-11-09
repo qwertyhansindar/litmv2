@@ -8954,22 +8954,6 @@ body.litm--colorblind .application.litm--printed-cards {
 		outline: 2px solid var(--color-litm-tag-text);
 		outline-offset: 2px;
 	}
-
-	&.litm--sacrifice-button {
-		color: var(--color-litm-weakness-text);
-		background: color-mix(in srgb, var(--color-litm-weakness) 18%, transparent);
-		border-color: var(--color-litm-weakness-text);
-
-		&:hover,
-		&:focus-visible {
-			background: color-mix(
-				in srgb,
-				var(--color-litm-weakness) 38%,
-				transparent
-			);
-			border-color: var(--color-litm-weakness-text);
-		}
-	}
 }
 
 /* The bar's own width decides whether the labels fit, not the sheet's. */
