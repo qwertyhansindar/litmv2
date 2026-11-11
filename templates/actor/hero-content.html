@@ -144,7 +144,13 @@
 	</div>
 	{{else}}
 	<div class="litm-hero-board__themes empty-state">
+		{{#if @root.isOwner}}
+		<button type="button" data-action="browseThemes" data-tooltip="{{localize 'LITM.Ui.theme_browser_browse'}}" aria-label="{{localize 'LITM.Ui.theme_browser_browse'}}">
+			<img height="64" width="64" src="systems/litmv2/assets/media/icons/book.svg" alt="" aria-hidden="true" />
+		</button>
+		{{else}}
 		<img height="64" width="64" src="systems/litmv2/assets/media/icons/book.svg" alt="" aria-hidden="true" />
+		{{/if}}
 		<p class="hint">{{localize "LITM.Ui.no_themes"}}</p>
 	</div>
 	{{/if}}
@@ -160,6 +166,10 @@
 				<button type="button" class="noflex" data-action="editItem" data-item-id="{{backpack.id}}"
 					data-tooltip="{{localize 'LITM.Ui.edit_backpack'}}" aria-label="{{localize 'LITM.Ui.edit_backpack'}}">
 					<i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+				</button>
+				<button type="button" class="noflex" data-action="addStoryTag" data-tag-type="story_tag"
+					data-tooltip="{{localize 'LITM.Ui.add_tag'}}" aria-label="{{localize 'LITM.Ui.add_tag'}}">
+					<i class="fa-solid fa-scroll" aria-hidden="true"></i>
 				</button>
 				{{/unless}}
 			</legend>

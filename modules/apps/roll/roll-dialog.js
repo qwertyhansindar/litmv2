@@ -1532,12 +1532,15 @@ export class LitmRollDialog extends foundry.applications.api.HandlebarsApplicati
 			mightPicker: {
 				...this.#mightPicker,
 				// A tier is lit by any pick in its rows, not only its own value.
-				rows: mightScaleRows().map((row) => {
-					const own = this.#mightPicker.picks.might;
-					if (row.tier && own != null)
-						row.tier.active = own >= row.tier.first && own <= row.tier.last;
-					return row;
-				}),
+				rows: this.#mightPicker.open
+					? mightScaleRows().map((row) => {
+							const own = this.#mightPicker.picks.might;
+							if (row.tier && own != null)
+								row.tier.active =
+									own >= row.tier.first && own <= row.tier.last;
+							return row;
+						})
+					: [],
 			},
 			narratorCommands: isGMViewer && !!this.#ownerId && !this.localOnly,
 			canTradePower: canEditTradePower({

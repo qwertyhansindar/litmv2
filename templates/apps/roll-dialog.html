@@ -1,3 +1,6 @@
+{{!-- Tag rows of one group. Cards drops the title tag (the plaque names it);
+     Classic drops a tag that cannot be invoked. --}}
+{{#*inline "tagRows"}}{{#each tags as |tag|}}{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}{{/each}}{{/inline}}
 {{#*inline "roll-tab"}}
 <a class="item {{tab.cssClass}}" data-action="tab" data-group="{{group}}" data-tab="{{tab.id}}">
 	{{#if tab.actorImg}}<img src="{{tab.actorImg}}" alt="" />{{else if tab.icon}}<i class="{{tab.icon}}" aria-hidden="true"></i>{{/if}}
@@ -5,8 +8,8 @@
 	<span class="litm--roll-dialog-tab-power" data-tab-power="{{tab.id}}">{{tab.power}}</span>
 </a>
 {{/inline}}
-{{!-- Trade Power. The Cards look shows it in the footer, by Total Power;
-     Classic keeps it under Might. --}}
+{{!-- Trade Power. The Cards look shows it under the caption, where the
+     Sacrifice switch sits; Classic keeps it under Might. --}}
 {{#*inline "tradePower"}}
 <div class="litm--trade-power-fieldset hidden">
 	<div class="litm--roll-type-bar litm--trade-power-bar">
@@ -228,6 +231,9 @@
 			</table>
 		</div>
 		{{/if}}
+		{{!-- The roller's option under the Narrator's half it varies: Trade
+		      Power on a Detailed roll. --}}
+		{{#if canTradePower}}{{> tradePower}}{{/if}}
 		{{else}}
 		{{#if narratorCall}}
 		<div class="litm-banner litm--narrator-call-banner">
@@ -608,9 +614,7 @@
 					{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-actor-label"}}
 					{{/if}}
 					<ul class="plain litm--roll-dialog-tags-summary">
-						{{#each group.tags as |tag|}}
-						{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-						{{/each}}
+						{{> tagRows tags=group.tags}}
 					</ul>
 				</div>
 				{{/each}}
@@ -633,9 +637,7 @@
 				<div class="litm--roll-dialog-theme-group"{{#if group.level}} data-level="{{group.level}}"{{/if}}{{#if group.banner}} data-banner="{{group.banner}}"{{/if}}>
 					{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-actor-label"}}
 					<ul class="plain litm--roll-dialog-tags-summary">
-						{{#each group.tags as |tag|}}
-						{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-						{{/each}}
+						{{> tagRows tags=group.tags}}
 					</ul>
 				</div>
 				{{/each}}
@@ -652,9 +654,7 @@
 				<div class="litm--roll-dialog-theme-group"{{#if group.level}} data-level="{{group.level}}"{{/if}}{{#if group.banner}} data-banner="{{group.banner}}"{{/if}}>
 					{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-actor-label"}}
 					<ul class="plain litm--roll-dialog-tags-summary">
-						{{#each group.tags as |tag|}}
-						{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-						{{/each}}
+						{{> tagRows tags=group.tags}}
 					</ul>
 				</div>
 				{{/each}}
@@ -686,9 +686,7 @@
 					<div class="litm--roll-dialog-theme-group"{{#if group.level}} data-level="{{group.level}}"{{/if}}{{#if group.banner}} data-banner="{{group.banner}}"{{/if}}>
 						{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-theme-label"}}
 						<ul class="plain litm--roll-dialog-tags-summary">
-							{{#each group.tags as |tag|}}
-							{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-							{{/each}}
+							{{> tagRows tags=group.tags}}
 						</ul>
 					</div>
 					{{/each}}
@@ -773,9 +771,7 @@
 				<div class="litm--roll-dialog-theme-group"{{#if group.level}} data-level="{{group.level}}"{{/if}}{{#if group.banner}} data-banner="{{group.banner}}"{{/if}}>
 					{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-theme-label"}}
 					<ul class="plain litm--roll-dialog-tags-summary">
-						{{#each group.tags as |tag|}}
-						{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-						{{/each}}
+						{{> tagRows tags=group.tags}}
 					</ul>
 				</div>
 				{{/each}}
@@ -788,9 +784,7 @@
 			<div class="litm--roll-dialog-theme-group"{{#if group.level}} data-level="{{group.level}}"{{/if}}{{#if group.banner}} data-banner="{{group.banner}}"{{/if}}>
 				{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-actor-label"}}
 				<ul class="plain litm--roll-dialog-tags-summary">
-					{{#each group.tags as |tag|}}
-					{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-					{{/each}}
+					{{> tagRows tags=group.tags}}
 				</ul>
 			</div>
 			{{/each}}
@@ -808,9 +802,7 @@
 				<div class="litm--roll-dialog-theme-group"{{#if group.level}} data-level="{{group.level}}"{{/if}}{{#if group.banner}} data-banner="{{group.banner}}"{{/if}}>
 					{{> "systems/litmv2/templates/partials/roll-plaque.html" group=group label="litm--roll-dialog-theme-label"}}
 					<ul class="plain litm--roll-dialog-tags-summary">
-						{{#each group.tags as |tag|}}
-						{{#unless (or (and @root.isCardsLook tag.system.isTitleTag) (and (not @root.isCardsLook) tag.isUnavailable))}}{{> "systems/litmv2/templates/partials/roll-tag.html" tag=tag}}{{/unless}}
-						{{/each}}
+						{{> tagRows tags=group.tags}}
 					</ul>
 				</div>
 				{{/each}}
@@ -915,7 +907,6 @@
 		{{#if isCardsLook}}
 		<ul class="plain litm--roll-dialog-chips" aria-label="{{localize 'LITM.Ui.roll_chips_label'}}"></ul>
 		{{/if}}
-		{{#if (and canTradePower isCardsLook)}}{{> tradePower}}{{/if}}
 		<!-- Total Power -->
 		<div class="litm--roll-dialog-total-power">
 			<span class="flex1">{{localize "LITM.Ui.total_power"}}</span>

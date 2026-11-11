@@ -201,7 +201,18 @@ export class HeroSheet extends LitmActorSheet {
 				const themes = this.document.items.filter(
 					(i) => i.type === "theme" && !i.system.isFellowship,
 				);
-				if (!themes.length) return false;
+				// Nothing to replace yet: a kit is added as a drop would add it.
+				if (!themes.length) {
+					const source = await foundry.utils.fromUuid(entry.uuid);
+					if (source?.type !== "theme") {
+						ui.notifications.warn(
+							game.i18n.localize("LITM.Ui.warn_hero_drop_creation_kit"),
+						);
+						return false;
+					}
+					await this.document.createEmbeddedDocuments("Item", [source.toObject()]);
+					return true;
+				}
 				const options = themes
 					.map(
 						(th, ix) =>
