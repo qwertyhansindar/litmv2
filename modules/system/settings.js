@@ -29,6 +29,11 @@ async function refreshCardsSheets() {
 	for (const actor of actors) {
 		const sheet = actor._sheet;
 		if (!sheet || sheet.constructor === actor._getSheetClass()) continue;
+		// The roll window belongs to its sheet instance; swapping the sheet
+		// would orphan a live roll and let a second window open beside it.
+		// shortcut: that sheet keeps its look until reload; hand the dialog to
+		// the new sheet if that turns out to bother anyone.
+		if (sheet.hasRollDialog && sheet.rollDialogInstance.rendered) continue;
 		const open = sheet.rendered;
 		await sheet.close();
 		actor._sheet = null;
