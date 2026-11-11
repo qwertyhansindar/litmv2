@@ -3599,6 +3599,7 @@ section.standard-form.litm-theme-browser-body {
 	align-items: center;
 	gap: var(--spacer-4);
 	cursor: pointer;
+	-webkit-user-select: none;
 	user-select: none;
 }
 
@@ -3767,6 +3768,13 @@ section.standard-form.litm-theme-browser-body {
 
 .litm--roll-dialog-tabs [data-tab].active img {
 	border-color: var(--color-border);
+}
+
+/* The Fellowship's default icon is drawn white: ink it on the light theme.
+   Portraits and custom art keep their colours. */
+.litm--roll :is(.litm--roll-dialog-tabs, .litm--roll-dialog-actor-label)
+	img[src$="icons/fellowship.svg"] {
+	filter: var(--litm-icon-filter);
 }
 
 /* ========================================
@@ -5855,6 +5863,7 @@ input.litm--single-use::after {
 
 .litm-spend-power .litm-spend-power__tag-chip {
 	cursor: pointer;
+	-webkit-user-select: none;
 	user-select: none;
 	opacity: 0.6;
 	transition: opacity var(--transition-fast) ease;
@@ -9055,6 +9064,9 @@ body.theme-dark
 /* The banner is the card's drag handle (Play and Edit mode). */
 .litm--printed-cards .theme-card > legend.draggable {
 	cursor: grab;
+	/* Safari would select a word of the title on the double-click that opens the theme. */
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 /* Reserve room for the absolutely placed buttons so a long title never runs
@@ -10634,7 +10646,6 @@ body.litm--colorblind .application.litm--roll-cards {
 	height: auto;
 	min-height: 0;
 	padding: 0 var(--spacer-4);
-	line-height: 1.5;
 	border: 1px solid transparent;
 	background: none;
 	box-shadow: none;
