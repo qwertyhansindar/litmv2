@@ -1,8 +1,8 @@
 {{!-- The Heroes: the GM's overview of every linked hero, on both Fellowship sheets. --}}
 {{#if isGM}}
-<fieldset class="litm-party-overview">
-	<legend>
-		<span>{{localize "LITM.Ui.party_overview"}}</span>
+<fieldset class="litm-party-overview{{#if cardsLayout}} theme-card{{/if}}"{{#if cardsLayout}} data-banner="kit"{{/if}}>
+	<legend{{#if cardsLayout}} class="litm-banner theme-card__book"{{/if}}>
+		<span{{#if cardsLayout}} class="theme-card__banner-tag"{{/if}}>{{localize "LITM.Ui.party_overview"}}</span>
 		<button type="button" class="litm-party-overview__toggle plain icon"
 			data-action="togglePartyShowAll"
 			aria-pressed="{{partyShowAll}}"
