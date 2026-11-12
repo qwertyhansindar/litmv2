@@ -10744,9 +10744,10 @@ body.litm--colorblind .application.litm--roll-cards {
 
 }
 
-/* Secret Grace takes the Might's cell and its box; only the dove marks it.
-   A player reads the value, so their box is not a control. */
-.litm--roll-cards .litm--grace-control .litm--might-name i {
+/* Secret Grace takes the Might's cell and its box; the dove beside it, sized
+   as the Might's steps, opens the Hero's Secret Grace. */
+.litm--roll-cards .litm--grace-open i {
+	font-size: var(--font-size-14);
 	color: var(--color-litm-weakness-text);
 }
 
