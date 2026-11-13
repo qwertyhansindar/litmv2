@@ -523,6 +523,8 @@
 						{{/if}}
 					</div>
 					{{/if}}
+					{{!-- A story theme has no Quest, tracks or Improve (Core Book p.163). --}}
+					{{#if t.tracks.length}}
 					<div class="litm--sacrifice-theme-lower">
 						<div class="theme-card-tracks">
 							{{#each t.tracks}}
@@ -548,6 +550,7 @@
 						</ul>
 						{{/if}}
 					</div>
+					{{/if}}
 				</div>
 				{{else}}
 				<fieldset class="theme-card {{#if t.selected}}is-selected{{/if}} {{#if t.spent}}is-spent{{/if}} {{#if t.storyThemeHidden}}hidden{{/if}}"
